@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/client-piss/client-piss.iml" filepath="$PROJECT_DIR$/client-piss/client-piss.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/fmi-piss.iml" filepath="$PROJECT_DIR$/.idea/fmi-piss.iml" />
+      <module fileurl="file://$PROJECT_DIR$/models-piss/models-piss.iml" filepath="$PROJECT_DIR$/models-piss/models-piss.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server-piss/server-piss.iml" filepath="$PROJECT_DIR$/server-piss/server-piss.iml" />
+    </modules>
+  </component>
+</project>

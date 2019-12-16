@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <RadioButton layoutX="32.0" layoutY="26.0" mnemonicParsing="false" onAction="#changeDriver" selected="true" text="Driver" />
+            <TableView fx:id="rides" layoutY="171.0" onMouseClicked="#proposeRide" prefHeight="229.0" prefWidth="600.0">
+              <columns>
+                <TableColumn fx:id="passengerCell" prefWidth="151.0" text="Passenger" />
+                <TableColumn fx:id="startPointCell" prefWidth="186.0" text="Start point" />
+                  <TableColumn fx:id="endPointCell" prefWidth="162.0" text="Endpoint" />
+                  <TableColumn fx:id="passengersCell" prefWidth="100.0" text="Passengers" />
+              </columns>
+            </TableView>
+            <Button fx:id="refreshButtonDriver" layoutX="50.0" layoutY="74.0" mnemonicParsing="false" onAction="#refreshListDriver" text="Refresh list" />
+            <TextField fx:id="currentEndPoint" editable="false" layoutX="399.0" layoutY="74.0" />
+            <TextField fx:id="currentPassengers" editable="false" layoutX="399.0" layoutY="125.0" />
+            <TextField fx:id="currentStartPoint" editable="false" layoutX="202.0" layoutY="74.0" />
+            <TextField fx:id="currentPassenger" editable="false" layoutX="202.0" layoutY="125.0" />
+            <Text layoutX="228.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Start point" />
+            <Text layoutX="413.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Current End point" />
+            <Text layoutX="225.0" layoutY="117.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Passenger" />
+            <Text layoutX="407.0" layoutY="117.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Amount of passengers" />
+            <Button fx:id="proposedRideButton" layoutX="32.0" layoutY="125.0" mnemonicParsing="false" onAction="#refreshProposed" text="Refresh proposed ride" />
+         </children>
+      </AnchorPane>
+   </children>
+</GridPane>

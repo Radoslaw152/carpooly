@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <Text layoutX="36.0" layoutY="106.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" wrappingWidth="68.2060546875" />
+            <Text layoutX="25.0" layoutY="162.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password:" />
+            <Text layoutX="29.0" layoutY="218.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" wrappingWidth="56.4189453125" />
+            <Text layoutX="28.0" layoutY="268.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Surname:" />
+            <TextField fx:id="emailRegister" layoutX="119.0" layoutY="88.0" />
+            <PasswordField fx:id="passwordRegister" layoutX="119.0" layoutY="144.0" />
+            <TextField fx:id="nameRegister" layoutX="119.0" layoutY="200.0" />
+            <TextField fx:id="surnameRegister" layoutX="119.0" layoutY="257.0" />
+            <Button fx:id="registerButton" layoutX="57.0" layoutY="321.0" mnemonicParsing="false" onAction="#register" prefHeight="27.0" prefWidth="152.0" text="Register" />
+         </children>
+      </AnchorPane>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+         <children>
+            <TextField fx:id="emailLogin" layoutX="119.0" layoutY="119.0" />
+            <Button fx:id="loginButton" layoutX="107.0" layoutY="321.0" mnemonicParsing="false" onAction="#logIn" prefHeight="27.0" prefWidth="152.0" text="Log in" />
+            <Text layoutX="31.0" layoutY="137.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" />
+            <Text layoutX="31.0" layoutY="205.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password:" />
+            <PasswordField fx:id="passwordLogin" layoutX="119.0" layoutY="187.0" />
+         </children>
+      </AnchorPane>
+   </children>
+</GridPane>
