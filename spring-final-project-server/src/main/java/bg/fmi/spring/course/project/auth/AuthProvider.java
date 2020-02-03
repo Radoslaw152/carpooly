@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import bg.fmi.spring.course.project.dao.Account;
@@ -40,9 +41,10 @@ public class AuthProvider implements AuthenticationProvider {
             return null;
         }
 
+
         Authentication auth = new UsernamePasswordAuthenticationToken(authentication.getName(),
                 authentication.getCredentials(),
-                authentication.getAuthorities());
+                Collections.singletonList(() -> account.getRole().toString().toUpperCase()));
         return auth;
     }
 

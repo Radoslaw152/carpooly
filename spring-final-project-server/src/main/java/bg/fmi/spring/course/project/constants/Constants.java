@@ -7,8 +7,8 @@ public class Constants {
     public static final String TOKEN_HEADER = "Authorization";
     public static final String JWT_TOKEN_PREFIX = "Bearer ";
     public static final String TOKEN_TYPE = "JWT";
-    public static final String TOKEN_ISSUER = "hospital-assistant-api";
-    public static final String TOKEN_AUDIENCE = "hospital-assistant-user";
+    public static final String TOKEN_ISSUER = "carpooly-api";
+    public static final String TOKEN_AUDIENCE = "carpooly-user";
 
     public static final String BASIC_AUTH_TOKEN_PREFIX = "Basic ";
     public static final String EMAIL_KEY = "email";

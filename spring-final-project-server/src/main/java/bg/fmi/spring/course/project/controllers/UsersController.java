@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -29,8 +31,10 @@ public class UsersController {
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<Account>> getAccounts() {
-        return ResponseEntity.ok(accountService.getAccounts());
+    public ResponseEntity<List<Account>> getAccounts(HttpServletRequest request) {
+        List<Account> accounts = accountService.getAccounts();
+        accounts.forEach(account -> account.setPasswordHash(null));
+        return ResponseEntity.ok(accounts);
     }
 
     @ResponseBody

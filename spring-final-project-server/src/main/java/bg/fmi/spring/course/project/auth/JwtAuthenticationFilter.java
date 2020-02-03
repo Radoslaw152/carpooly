@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import bg.fmi.spring.course.project.constants.Constants;
 import bg.fmi.spring.course.project.constants.Role;
+import bg.fmi.spring.course.project.interfaces.services.AccountService;
 import bg.fmi.spring.course.project.utils.JsonUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -32,9 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private AuthenticationManager authenticationManager;
+    private AccountService accountService;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, AccountService accountService) {
         this.authenticationManager = authenticationManager;
+        this.accountService = accountService;
         setFilterProcessesUrl(Constants.AUTH_LOGIN_URL);
     }
 
@@ -56,8 +60,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             email = node.get(Constants.EMAIL_KEY).asText();
             password = node.get(Constants.PASSWORD_KEY).asText();
-            role = Role.valueOf(node.get(Constants.ROLE_KEY).asText().toUpperCase());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return null;
         }
@@ -65,9 +68,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email,
                         password,
-                        Collections.singletonList(
-                                new SimpleGrantedAuthority(
-                                        role.name())));
+                        new ArrayList<>());
         return authenticationManager.authenticate(authenticationToken);
     }
 

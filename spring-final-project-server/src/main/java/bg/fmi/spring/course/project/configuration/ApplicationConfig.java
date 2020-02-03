@@ -20,6 +20,7 @@ import bg.fmi.spring.course.project.auth.AuthProvider;
 import bg.fmi.spring.course.project.auth.JwtAuthenticationFilter;
 import bg.fmi.spring.course.project.auth.JwtAuthorizationFilter;
 import bg.fmi.spring.course.project.constants.Role;
+import bg.fmi.spring.course.project.interfaces.services.AccountService;
 
 @Configuration
 public class ApplicationConfig extends WebSecurityConfigurerAdapter {
@@ -27,6 +28,8 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
     private AuthProvider authProvider;
     @Autowired
     private AuthenticationEventPublisher authEventPublisher;
+    @Autowired
+    private AccountService accountService;
 
 
     @Override
@@ -35,11 +38,11 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 //@TODO ADD ANTMACTCHERS
-                .antMatchers("/api/users").permitAll()
+//                .antMatchers("/api/accounts").authenticated()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new BasicAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), accountService))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager()))
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
