@@ -1,13 +1,17 @@
 package bg.fmi.spring.course.project.dao;
 
-import org.springframework.data.annotation.Id;
-
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
@@ -22,15 +26,25 @@ import lombok.NonNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Ratings {
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Rating {
+        private String emailFrom;
+        private Integer rating;
+    }
+
     @Id
     @GeneratedValue
     private Long id;
     @NonNull
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "ACCOUNT_ID")
     private Account account;
     @Builder.Default
     @NonNull
-    private Map<String,Integer> ratings = new HashMap<>();
+    @ElementCollection(targetClass = HashSet.class)
+    private Set<Rating> ratings = new HashSet<>();
 
     public void addRating(String from, Integer rating) {
         if(rating < 0 || rating > 5) {
@@ -39,7 +53,7 @@ public class Ratings {
         if(account.getEmail().equals(from)) {
             //@TODO add exception
         }
-        ratings.put(from,rating);
+        ratings.add(new Rating(from, rating));
     }
 
     public double getAverageRating() {
@@ -47,8 +61,8 @@ public class Ratings {
             return 0;
         }
         int score = 0;
-        for(Integer rating : ratings.values()) {
-            score += rating;
+        for(Rating rating : ratings) {
+            score += rating.getRating();
         }
         return score / (double) ratings.size();
     }

@@ -5,6 +5,5 @@ import org.springframework.stereotype.Repository;
 
 import bg.fmi.spring.course.project.dao.ChangeRoleRequest;
 
-@Repository
 public interface ChangeRoleRequestRepository extends JpaRepository<ChangeRoleRequest, Long> {
 }

@@ -23,17 +23,6 @@ import bg.fmi.spring.course.project.constants.Role;
 
 @Configuration
 public class ApplicationConfig extends WebSecurityConfigurerAdapter {
-    @Value("${first.name.admin:admin")
-    private String firstNameAdmin;
-    @Value("${surname.admin:admin}")
-    private String surnameAdmin;
-    @Value("${role.admin:ADMIN}")
-    private Role roleAdmin;
-    @Value("${email.admin:admin}")
-    private String emailAdmin;
-    @Value("${password.admin:admin}dsfsdf")
-    private String passwordAdmin;
-
     @Autowired
     private AuthProvider authProvider;
     @Autowired
@@ -46,7 +35,7 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 //@TODO ADD ANTMACTCHERS
-                // .antMatchers().permitAll()
+                .antMatchers("/api/users").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new BasicAuthenticationFilter(authenticationManager()))
@@ -54,11 +43,6 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtAuthorizationFilter(authenticationManager()))
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Override
@@ -71,8 +55,8 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
-
         return source;
     }
+
 
 }

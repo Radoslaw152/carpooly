@@ -1,11 +1,12 @@
 package bg.fmi.spring.course.project.dao;
 
 import org.hibernate.validator.constraints.Length;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.Valid;
 
@@ -43,6 +44,7 @@ public class Account {
     @Builder.Default
     @NonNull
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "RATINGS_ID")
     @Valid
     private Ratings rating = new Ratings();
 }

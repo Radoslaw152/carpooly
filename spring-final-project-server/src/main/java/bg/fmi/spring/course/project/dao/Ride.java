@@ -1,11 +1,11 @@
 package bg.fmi.spring.course.project.dao;
 
-import org.springframework.data.annotation.Id;
-
 import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.Valid;
@@ -28,6 +28,7 @@ public class Ride {
     @OneToOne
     @NonNull
     @Valid
+    @JoinColumn(name = "DRIVER_ID")
     private Account driver;
     @OneToMany
     @NonNull
@@ -37,8 +38,10 @@ public class Ride {
     private String startingDestination;
     @NonNull
     private String finalDestination;
-    private double price;
-    private boolean isStarted;
+    @NonNull
+    private Double price;
+    @NonNull
+    private Boolean isStarted;
 
     public boolean checkPaid() {
         for(Payment payment : passengers.values()) {

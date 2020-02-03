@@ -5,6 +5,5 @@ import org.springframework.stereotype.Repository;
 
 import bg.fmi.spring.course.project.dao.Payment;
 
-@Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 }

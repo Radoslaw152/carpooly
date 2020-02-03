@@ -1,10 +1,10 @@
 package bg.fmi.spring.course.project.dao;
 
-import org.springframework.data.annotation.Id;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import bg.fmi.spring.course.project.constants.PaymentType;
@@ -25,6 +25,7 @@ public class Payment {
     private Long id;
     @NonNull
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "RIDE_ID")
     private Ride ride;
     @NonNull
     private PaymentType paymentType;

@@ -5,6 +5,5 @@ import org.springframework.stereotype.Repository;
 
 import bg.fmi.spring.course.project.dao.Ride;
 
-@Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
 }

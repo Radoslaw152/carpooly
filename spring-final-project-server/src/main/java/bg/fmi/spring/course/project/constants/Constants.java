@@ -11,7 +11,7 @@ public class Constants {
     public static final String TOKEN_AUDIENCE = "hospital-assistant-user";
 
     public static final String BASIC_AUTH_TOKEN_PREFIX = "Basic ";
-    public static final String EMAIL_KEY = "username";
+    public static final String EMAIL_KEY = "email";
     public static final String PASSWORD_KEY = "password";
     public static final String ROLE_KEY = "role";
 }

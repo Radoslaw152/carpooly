@@ -5,6 +5,5 @@ import org.springframework.stereotype.Repository;
 
 import bg.fmi.spring.course.project.dao.Ratings;
 
-@Repository
 public interface RatingsRepository extends JpaRepository<Ratings, Long> {
 }

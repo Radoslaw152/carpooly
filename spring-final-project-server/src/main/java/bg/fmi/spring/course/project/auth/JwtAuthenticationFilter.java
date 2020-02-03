@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             email = node.get(Constants.EMAIL_KEY).asText();
             password = node.get(Constants.PASSWORD_KEY).asText();
-            role = Role.valueOf(node.get(Constants.ROLE_KEY).asText());
+            role = Role.valueOf(node.get(Constants.ROLE_KEY).asText().toUpperCase());
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -68,7 +68,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                         Collections.singletonList(
                                 new SimpleGrantedAuthority(
                                         role.name())));
-
         return authenticationManager.authenticate(authenticationToken);
     }
 
@@ -76,7 +75,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain, Authentication authentication) {
-        User user = ((User) authentication.getPrincipal());
+        UsernamePasswordAuthenticationToken user = ((UsernamePasswordAuthenticationToken) authentication);
 
         List<String> roles = user.getAuthorities()
                 .stream()
@@ -89,7 +88,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .setHeaderParam("typ", Constants.TOKEN_TYPE)
                 .setIssuer(Constants.TOKEN_ISSUER)
                 .setAudience(Constants.TOKEN_AUDIENCE)
-                .setSubject(user.getUsername())
+                .setSubject(user.getPrincipal().toString())
                 .setExpiration(new Date(System.currentTimeMillis() + 864000000))
                 .claim("role", roles)
                 .compact();

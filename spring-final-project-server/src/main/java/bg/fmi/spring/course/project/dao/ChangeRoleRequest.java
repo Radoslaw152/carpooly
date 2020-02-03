@@ -4,6 +4,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.Valid;
 
@@ -25,6 +26,7 @@ public class ChangeRoleRequest {
     @NonNull
     @Valid
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "REQUEST_ACCOUNT_ID")
     private Account requestAccount;
     @NonNull
     private Role wantedRole;
