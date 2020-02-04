@@ -20,8 +20,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import bg.fmi.spring.course.project.auth.AuthProvider;
 import bg.fmi.spring.course.project.auth.JwtAuthenticationFilter;
 import bg.fmi.spring.course.project.auth.JwtAuthorizationFilter;
-import bg.fmi.spring.course.project.constants.Role;
-import bg.fmi.spring.course.project.interfaces.services.AccountService;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -30,9 +28,6 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
     private AuthProvider authProvider;
     @Autowired
     private AuthenticationEventPublisher authEventPublisher;
-    @Autowired
-    private AccountService accountService;
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -44,7 +39,7 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new BasicAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), accountService))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager()))
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
