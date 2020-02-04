@@ -60,6 +60,7 @@ public class UsersController {
     @RequestMapping(method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PreAuthorize("hasRole('ADMIN'")
     public ResponseEntity<Account> addAccount(@Valid @RequestBody Account account) {
         Account result = accountService.addAccount(account);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
@@ -69,6 +70,8 @@ public class UsersController {
             value = "{id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PreAuthorize("(#id == authentication.principal.getId()) or hasRole('ADMIN') or"
+            + " (hasRole('MODERATOR') and #account.getRole().toString() != 'ADMIN')")
     public ResponseEntity<Account> updateAccount(@PathVariable Long id, @Valid @RequestBody Account account) {
         Account updatedAccount = accountService.updateAccount(id, account);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedAccount);
@@ -77,6 +80,8 @@ public class UsersController {
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST,
             value = "{id}")
+    @PreAuthorize("(#id == authentication.principal.getId()) or hasRole('ADMIN') or"
+     + " (hasRole('MODERATOR') and #account.getRole().toString() != 'ADMIN')")
     public ResponseEntity deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();

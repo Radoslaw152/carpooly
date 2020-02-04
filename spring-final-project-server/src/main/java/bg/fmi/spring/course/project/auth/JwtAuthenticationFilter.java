@@ -34,11 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private AuthenticationManager authenticationManager;
-    private AccountService accountService;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, AccountService accountService) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
-        this.accountService = accountService;
         setFilterProcessesUrl(Constants.AUTH_LOGIN_URL);
     }
 
