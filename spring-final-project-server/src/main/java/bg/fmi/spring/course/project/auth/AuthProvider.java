@@ -42,7 +42,7 @@ public class AuthProvider implements AuthenticationProvider {
         }
 
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(authentication.getName(),
+        Authentication auth = new UsernamePasswordAuthenticationToken(account,
                 authentication.getCredentials(),
                 Collections.singletonList(() -> account.getRole().toString().toUpperCase()));
         return auth;
