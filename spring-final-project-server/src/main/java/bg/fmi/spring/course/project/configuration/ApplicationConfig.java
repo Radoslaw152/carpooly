@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,6 +24,7 @@ import bg.fmi.spring.course.project.constants.Role;
 import bg.fmi.spring.course.project.interfaces.services.AccountService;
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class ApplicationConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthProvider authProvider;
@@ -38,7 +40,7 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 //@TODO ADD ANTMACTCHERS
-//                .antMatchers("/api/accounts").authenticated()
+                .antMatchers("/api/register").anonymous()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new BasicAuthenticationFilter(authenticationManager()))

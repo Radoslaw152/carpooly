@@ -1,5 +1,6 @@
 package bg.fmi.spring.course.project.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import org.hibernate.validator.constraints.Length;
@@ -40,8 +41,8 @@ public class Account {
     @NonNull
     @Length(min = 3, max = 16)
     private String email;
+    @JsonIgnore
     private String passwordHash;
-    @NonNull
     private Role role;
     @Builder.Default
     private boolean isInRide = false;
