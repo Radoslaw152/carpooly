@@ -60,7 +60,7 @@ public class UsersController {
     @RequestMapping(method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize("hasRole('ADMIN'")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Account> addAccount(@Valid @RequestBody Account account) {
         Account result = accountService.addAccount(account);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
