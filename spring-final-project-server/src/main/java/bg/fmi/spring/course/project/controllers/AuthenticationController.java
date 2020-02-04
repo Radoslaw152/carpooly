@@ -35,7 +35,6 @@ public class AuthenticationController {
             account.setRole(Role.PASSENGER);
         }
         Account result = accountService.addAccount(account);
-        result.setPasswordHash(null);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 }

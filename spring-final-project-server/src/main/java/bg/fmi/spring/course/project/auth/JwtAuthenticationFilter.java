@@ -89,7 +89,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .setHeaderParam("typ", Constants.TOKEN_TYPE)
                 .setIssuer(Constants.TOKEN_ISSUER)
                 .setAudience(Constants.TOKEN_AUDIENCE)
-                .setSubject(user.getPrincipal().toString())
+                .setSubject(JsonUtil.toStringObject(user.getPrincipal()))
                 .setExpiration(new Date(System.currentTimeMillis() + 864000000))
                 .claim("role", roles)
                 .compact();

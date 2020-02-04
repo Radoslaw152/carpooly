@@ -64,7 +64,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-//    @PostFilter("(filterObject.id == authentication.principal.id) or hasRole('ADMIN')")
     public Optional<Account> getAccountByEmail(String email) {
         log.debug("Searching account by Email - {}", email);
         return accountRepository.findAll()

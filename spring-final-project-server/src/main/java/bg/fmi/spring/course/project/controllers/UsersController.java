@@ -3,6 +3,7 @@ package bg.fmi.spring.course.project.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +50,7 @@ public class UsersController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/email/{email}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PreAuthorize("(#email == authentication.principal.getEmail()) or hasRole('ADMIN')")
     public ResponseEntity<Account> getAccountByEmail(@PathVariable String email) {
         //TODO add exception
         Account account = accountService.getAccountByEmail(email).orElseThrow(() -> new RuntimeException("There is no account with such email."));

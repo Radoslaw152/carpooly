@@ -1,5 +1,6 @@
 package bg.fmi.spring.course.project.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,6 +17,23 @@ public class JsonUtil {
       return MAPPER.readTree(jsonString);
     } catch (IOException e) {
       log.error(e.getMessage(), e);
+      return null;
+    }
+  }
+  public static <T> T mapObject(String body, Class<T> tClass) {
+    try {
+      return MAPPER.readValue(body,tClass);
+    } catch (IOException e) {
+      log.error(e.getMessage(),e);
+      return null;
+    }
+  }
+
+  public static <T> String toStringObject(T object) {
+    try {
+      return MAPPER.writeValueAsString(object);
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage(),e);
       return null;
     }
   }
