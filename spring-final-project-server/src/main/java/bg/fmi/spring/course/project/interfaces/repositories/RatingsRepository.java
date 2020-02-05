@@ -1,9 +1,6 @@
 package bg.fmi.spring.course.project.interfaces.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import bg.fmi.spring.course.project.dao.Ratings;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface RatingsRepository extends JpaRepository<Ratings, Long> {
-}
+public interface RatingsRepository extends MongoRepository<Ratings, Long> {}
