@@ -27,3 +27,4 @@ target/
 .temp
 **/bin/
 .factorypath
+data
