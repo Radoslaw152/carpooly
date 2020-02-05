@@ -19,6 +19,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import bg.fmi.spring.course.project.auth.types.IsAdmin;
+import bg.fmi.spring.course.project.auth.types.IsSelfOrAdmin;
+import bg.fmi.spring.course.project.auth.types.IsSelfOrAdminOrModeratorChangingNonAdmin;
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.interfaces.services.AccountService;
 
@@ -33,7 +36,7 @@ public class UsersController {
 
     @RequestMapping(method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     public ResponseEntity<List<Account>> getAccounts(HttpServletRequest request) {
         List<Account> accounts = accountService.getAccounts();
         return ResponseEntity.ok(accounts);
@@ -50,7 +53,7 @@ public class UsersController {
     @RequestMapping(method = RequestMethod.GET,
             value = "/email/{email}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize("(#email == authentication.principal.getEmail()) or hasRole('ADMIN')")
+    @IsSelfOrAdmin
     public ResponseEntity<Account> getAccountByEmail(@PathVariable String email) {
         //TODO add exception
         Account account = accountService.getAccountByEmail(email).orElseThrow(() -> new RuntimeException("There is no account with such email."));
@@ -60,7 +63,7 @@ public class UsersController {
     @RequestMapping(method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsAdmin
     public ResponseEntity<Account> addAccount(@Valid @RequestBody Account account) {
         Account result = accountService.addAccount(account);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
@@ -70,8 +73,6 @@ public class UsersController {
             value = "{id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize("(#id == authentication.principal.getId()) or hasRole('ADMIN') or"
-            + " (hasRole('MODERATOR') and #account.getRole().toString() != 'ADMIN')")
     public ResponseEntity<Account> updateAccount(@PathVariable Long id, @Valid @RequestBody Account account) {
         Account updatedAccount = accountService.updateAccount(id, account);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedAccount);
@@ -80,8 +81,7 @@ public class UsersController {
     @ResponseBody
     @RequestMapping(method = RequestMethod.DELETE,
             value = "{id}")
-    @PreAuthorize("(#id == authentication.principal.getId()) or hasRole('ADMIN') or"
-     + " (hasRole('MODERATOR') and #account.getRole().toString() != 'ADMIN')")
+    @IsSelfOrAdminOrModeratorChangingNonAdmin
     public ResponseEntity deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
