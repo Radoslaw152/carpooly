@@ -1,8 +1,14 @@
 package bg.fmi.spring.course.project.dao;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -14,6 +20,7 @@ import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,17 +37,13 @@ public class Ride {
     @Id
     @GeneratedValue
     private Long id;
-    @NonNull
-    @Valid
-    @OneToOne
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "DRIVER_ID")
     private Account driver;
-    @NonNull
-    @Valid
-    @MapKeyJoinColumn(name = "PASSENGERS_ID")
-    @CollectionTable(name = "PASSENGERS_PAYMENT")
-    @ElementCollection(targetClass = HashMap.class)
-    private Map<Account, Payment> passengers;
+    @OneToMany
+    @Builder.Default
+    @JsonManagedReference
+    private List<Payment> passengers = new ArrayList<>();
     @NonNull
     private String startingDestination;
     @NonNull
@@ -48,14 +51,8 @@ public class Ride {
     @NonNull
     private Double price;
     @NonNull
-    private Boolean isStarted;
-
-    public boolean checkPaid() {
-        for(Payment payment : passengers.values()) {
-            if(!payment.isPaid()) {
-                return false;
-            }
-        }
-        return true;
-    }
+    @Min(1)
+    private Integer maxPassengers;
+    @Builder.Default
+    private Boolean isStarted = false;
 }

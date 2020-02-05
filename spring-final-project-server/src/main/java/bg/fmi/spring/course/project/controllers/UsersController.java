@@ -66,7 +66,7 @@ public class UsersController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @RequestMapping(method = RequestMethod.POST,
+    @RequestMapping(method = RequestMethod.PUT,
             value = "{id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -78,7 +78,7 @@ public class UsersController {
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.POST,
+    @RequestMapping(method = RequestMethod.DELETE,
             value = "{id}")
     @PreAuthorize("(#id == authentication.principal.getId()) or hasRole('ADMIN') or"
      + " (hasRole('MODERATOR') and #account.getRole().toString() != 'ADMIN')")
