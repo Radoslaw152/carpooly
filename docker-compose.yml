@@ -1,23 +1,13 @@
-version: '3'
-services:
-  mongodb:
-    image: mongo:latest
-    container_name: "mongodb"
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-    volumes:
-      - ./data/db:/data/db
-    ports:
-      - 27017:27017
-    command: mongod --logpath=/dev/null # --quiet
-
-  carpooly-backend:
-    build: ./spring-final-project-server
-    container_name: carpooly-backend
-    environment:
-      - DB_SERVER=carpooly
-    ports:
-      - 8080:8080
-    links:
-      - mongodb
+# Jenkins Master
+jenkins:
+  image: blacklabelops/hsqldb
+  container_name: hsqldb
+  ports:
+   - "9001:9001"
+  volumes:
+    - /opt/database
+  env_file:
+    - docker-compose.env
+  labels:
+    com.blacklabelops.description: "HSQL Development System"
+    com.blacklabelops.service: "hsqldb-server"
