@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/register")
+@RequestMapping("/api/register")
 public class AuthenticationController {
     private AccountService accountService;
 
