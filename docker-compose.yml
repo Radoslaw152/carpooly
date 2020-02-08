@@ -1,5 +1,5 @@
 # Jenkins Master
-jenkins:
+db:
   image: blacklabelops/hsqldb
   container_name: hsqldb
   ports:
@@ -11,3 +11,13 @@ jenkins:
   labels:
     com.blacklabelops.description: "HSQL Development System"
     com.blacklabelops.service: "hsqldb-server"
+
+carpooly-backend:
+  build: ./spring-final-project-server
+  container_name: carpooly-backend
+  environment:
+    - DB_SERVER=carpooly
+  ports:
+    - 8080:8080
+  links:
+    - db
