@@ -1,17 +1,15 @@
 package bg.fmi.spring.course.project.impl.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
 import bg.fmi.spring.course.project.interfaces.repositories.RideRepository;
 import bg.fmi.spring.course.project.interfaces.services.RideService;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class RideServiceImpl implements RideService {
@@ -29,8 +27,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public Optional<Ride> getRideByDriver(String email) {
-        return rideRepository.findAll()
-                .stream()
+        return rideRepository.findAll().stream()
                 .filter(ride -> ride.getDriver().getEmail().equals(email))
                 .findAny();
     }
@@ -42,16 +39,21 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public Ride getRideByIdSecure(Long id) {
-        return getRideById(id).orElseThrow(
-                () -> new RuntimeException(String.format("Ride with id=%s does not exist.", id)));
+        return getRideById(id)
+                .orElseThrow(
+                        () ->
+                                new RuntimeException(
+                                        String.format("Ride with id=%s does not exist.", id)));
     }
 
     @Override
     public Ride addRide(Ride ride) {
         Optional<Ride> existingRide = getRideByDriver(ride.getDriver().getEmail());
         if (existingRide.isPresent()) {
-            throw new RuntimeException(String.format("Ride with driver email=%s already exist",
-                    ride.getDriver().getEmail()));
+            throw new RuntimeException(
+                    String.format(
+                            "Ride with driver email=%s already exist",
+                            ride.getDriver().getEmail()));
         }
         return rideRepository.save(ride);
     }
@@ -72,9 +74,10 @@ public class RideServiceImpl implements RideService {
     public Ride startRide(Long id) {
         Ride ride = getRideByIdSecure(id);
         if (ride.getIsStarted()) {
-            throw new RuntimeException(String.format(
-                    "Ride with driver email=%s cannot be started, because it has been already started",
-                    ride.getDriver().getEmail()));
+            throw new RuntimeException(
+                    String.format(
+                            "Ride with driver email=%s cannot be started, because it has been already started",
+                            ride.getDriver().getEmail()));
         }
         ride.setIsStarted(true);
         return rideRepository.save(ride);
@@ -85,12 +88,14 @@ public class RideServiceImpl implements RideService {
         Ride ride = getRideByIdSecure(idRide);
         if (ride.getPassengers().contains(payment)) {
             throw new RuntimeException(
-                    String.format("Passenger with email=%s cannot join the same ride twice",
+                    String.format(
+                            "Passenger with email=%s cannot join the same ride twice",
                             payment.getOwner().getEmail()));
         }
         if (ride.getPassengers().size() == ride.getMaxPassengers()) {
-            throw new RuntimeException(String.format("Ride has exceeded maximum passengers - %s",
-                    ride.getMaxPassengers()));
+            throw new RuntimeException(
+                    String.format(
+                            "Ride has exceeded maximum passengers - %s", ride.getMaxPassengers()));
         }
         ride.getPassengers().add(payment);
         return rideRepository.save(ride);
@@ -99,11 +104,14 @@ public class RideServiceImpl implements RideService {
     @Override
     public Ride leaveRide(Long idRide, Account account) {
         Ride ride = getRideByIdSecure(idRide);
-        Optional<Payment> passenger = ride.getPassengers().stream().filter(
-                payment -> payment.getOwner().equals(account)).findAny();
+        Optional<Payment> passenger =
+                ride.getPassengers().stream()
+                        .filter(payment -> payment.getOwner().equals(account))
+                        .findAny();
         if (!passenger.isPresent()) {
             throw new RuntimeException(
-                    String.format("Passenger with email=%s isn't in the ride to join",
+                    String.format(
+                            "Passenger with email=%s isn't in the ride to join",
                             account.getEmail()));
         }
         ride.getPassengers().remove(passenger.get());
@@ -114,22 +122,24 @@ public class RideServiceImpl implements RideService {
     public Ride stopRide(Long id) {
         Ride ride = getRideByIdSecure(id);
         if (!ride.getIsStarted()) {
-            throw new RuntimeException(String.format(
-                    "Ride with driver email=%s cannot be stopped, because it hasn't started",
-                    ride.getDriver().getEmail()));
+            throw new RuntimeException(
+                    String.format(
+                            "Ride with driver email=%s cannot be stopped, because it hasn't started",
+                            ride.getDriver().getEmail()));
         }
         ride.setIsStarted(false);
         return rideRepository.save(ride);
     }
 
     @Override
-    public List<Ride> getAllRidesByDestination(String startingDestination,
-            String finalDestination) {
-        return rideRepository.findAll()
-                .stream()
-                .filter(ride -> ride.getStartingDestination().equals(startingDestination)
-                        && ride.getFinalDestination().equals(finalDestination)
-                        && !ride.getIsStarted())
+    public List<Ride> getAllRidesByDestination(
+            String startingDestination, String finalDestination) {
+        return rideRepository.findAll().stream()
+                .filter(
+                        ride ->
+                                ride.getStartingDestination().equals(startingDestination)
+                                        && ride.getFinalDestination().equals(finalDestination)
+                                        && !ride.getIsStarted())
                 .collect(Collectors.toList());
     }
 }
