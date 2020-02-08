@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.hibernate.validator.constraints.Length;
 
 @Data
@@ -22,19 +22,19 @@ import org.hibernate.validator.constraints.Length;
 public class Account {
     @Id @GeneratedValue private Long id;
 
-    @NonNull
+    @NotBlank
     @Length(min = 3, max = 16)
     private String firstName;
 
-    @NonNull
+    @NotBlank
     @Length(min = 3, max = 16)
     private String surname;
 
-    @NonNull
+    @NotBlank
     @Length(min = 3, max = 16)
     private String email;
 
-    @NonNull
+    @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passwordHash;
 

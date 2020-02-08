@@ -1,6 +1,5 @@
 package bg.fmi.spring.course.project.auth;
 
-import bg.fmi.spring.course.project.constants.Constants;
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.utils.JsonUtil;
 import bg.fmi.spring.course.project.utils.SecurityUtil;
@@ -11,10 +10,13 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +38,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
-        String header = request.getHeader(Constants.TOKEN_HEADER);
-        if (StringUtils.isEmpty(header) || !header.startsWith(Constants.JWT_TOKEN_PREFIX)) {
+        if (!extractToken(request).isPresent()) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -48,15 +49,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(Constants.TOKEN_HEADER);
-        if (!StringUtils.isEmpty(token)) {
+        Optional<String> token = extractToken(request);
+        if (token.isPresent()) {
             try {
-                Jws<Claims> parsedToken = SecurityUtil.decryptJwsToken(token);
+                Jws<Claims> parsedToken = SecurityUtil.decryptJwsToken(token.get());
 
                 String accountRaw = parsedToken.getBody().getSubject();
 
                 List<SimpleGrantedAuthority> authorities =
-                        ((List<?>) parsedToken.getBody().get(Constants.ROLE_KEY))
+                        ((List<?>) parsedToken.getBody().get(SecurityConstants.ROLE_KEY))
                                 .stream()
                                         .map(
                                                 authority ->
@@ -97,5 +98,23 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         return null;
+    }
+
+    private static Optional<String> extractToken(HttpServletRequest request) {
+        return Optional.ofNullable(
+                        extractCookieVal(request, SecurityConstants.ACCESS_TOKEN)
+                                .orElse(request.getHeader(SecurityConstants.TOKEN_HEADER)))
+                .map(header -> header.replace(SecurityConstants.BEARER_PREFIX, ""));
+    }
+
+    private static Optional<String> extractCookieVal(
+            HttpServletRequest request, String cookieName) {
+        if (request.getCookies() == null) {
+            return Optional.empty();
+        }
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals(cookieName))
+                .findFirst()
+                .map(Cookie::getValue);
     }
 }

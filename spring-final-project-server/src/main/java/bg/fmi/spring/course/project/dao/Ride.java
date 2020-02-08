@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,9 +34,9 @@ public class Ride {
     @OneToMany @Builder.Default @JsonManagedReference
     private List<Payment> passengers = new ArrayList<>();
 
-    @NonNull private String startingDestination;
-    @NonNull private String finalDestination;
-    @NonNull private Double price;
+    @NotBlank private String startingDestination;
+    @NotBlank private String finalDestination;
+    @NotNull private Double price;
 
     @NonNull
     @Min(1)
