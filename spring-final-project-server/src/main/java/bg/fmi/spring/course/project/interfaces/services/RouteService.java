@@ -1,4 +1,3 @@
 package bg.fmi.spring.course.project.interfaces.services;
 
-public interface RouteService {
-}
+public interface RouteService {}

@@ -1,6 +1,7 @@
 package bg.fmi.spring.course.project.interfaces.repositories;
 
-import bg.fmi.spring.course.project.dao.Route;
+import bg.fmi.spring.course.project.dao.Voucher;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RouteRepository extends JpaRepository<Route, Long> {}
+public interface VoucherRepository extends JpaRepository<Voucher, Long> {
+}

@@ -1,14 +1,24 @@
 package bg.fmi.spring.course.project.interfaces.services;
 
-import bg.fmi.spring.course.project.dao.Payment;
-import java.util.List;
-
 import bg.fmi.spring.course.project.constants.PaymentType;
 import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Payment;
+import bg.fmi.spring.course.project.dao.Ride;
+
+import java.util.List;
 
 public interface PaymentService {
+
     List<Payment> getAllPayments();
-    Payment newPayment(Account passenger, Account driver, double amount, PaymentType paymentType);
-    Payment getVouchers(Account account, int amount);
-    Payment giftVoucher(Account givenBy, Account givenTo, int amount);
+
+    List<Payment> getAllPaymentsForUser(Account user);
+    List<Payment> getAllPaymentsForUser(String user);
+
+    List<Payment> getAllPaymentsForRide(Ride ride);
+    List<Payment> getAllPaymentsForRide(Long rideId);
+
+    Payment newPayment(Account passenger, Ride ride, double amount, PaymentType paymentType);
+    Payment newPayment(String passenger, String driver, double amount, PaymentType paymentType);
+    Payment newPayment(Payment payment);
+    Payment newPaymentWIthVerification( Account passenger, Ride ride, double amount, PaymentType paymentType);
 }

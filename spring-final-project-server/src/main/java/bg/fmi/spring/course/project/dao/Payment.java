@@ -2,6 +2,7 @@ package bg.fmi.spring.course.project.dao;
 
 import bg.fmi.spring.course.project.constants.PaymentType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,6 +23,7 @@ import lombok.NonNull;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "owner")
 public class Payment {
+
     @Id @GeneratedValue private Long id;
 
     @OneToOne
@@ -33,6 +35,12 @@ public class Payment {
     @JsonBackReference
     private Ride ride;
 
-    @NonNull private PaymentType paymentType;
+    @NonNull
+    private PaymentType paymentType;
+
+    private Double amount;
+
+    private Date dateCompleted;
+
     private boolean isPaid = false;
 }
