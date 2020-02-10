@@ -31,7 +31,7 @@ public class Account {
     private String lastName;
 
     @NotBlank
-    @Length(min = 3, max = 16)
+    @Length(min = 3, max = 32)
     private String email;
 
     @NotBlank
