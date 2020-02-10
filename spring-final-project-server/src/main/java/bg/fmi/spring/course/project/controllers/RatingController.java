@@ -4,7 +4,6 @@ import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Rating;
 import bg.fmi.spring.course.project.interfaces.services.RatingService;
 import java.util.List;
-import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,31 +40,35 @@ public class RatingController {
     public ResponseEntity<List<Rating>> getRatingsFromUser(@RequestParam("usr") String username) {
         return ResponseEntity.ok(ratingService.getAllRatingsByUser(username));
     }
+
     @RequestMapping(
             method = RequestMethod.GET,
             value = "/by",
-           consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-           produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Rating>> getRatingsFromUser(@RequestBody @Valid Account user) {
         return ResponseEntity.ok(ratingService.getAllRatingsByUser(user));
     }
 
-    @RequestMapping(method = RequestMethod.GET,
+    @RequestMapping(
+            method = RequestMethod.GET,
             value = "/for-username",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<Rating>> getRatingsForUser(@RequestParam("usr") String username ) {
+    public ResponseEntity<List<Rating>> getRatingsForUser(@RequestParam("usr") String username) {
         return ResponseEntity.ok(ratingService.getAllRatingsForUser(username));
     }
 
-    @RequestMapping(method = RequestMethod.GET,
+    @RequestMapping(
+            method = RequestMethod.GET,
             value = "/for",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<Rating>> getRatingsForUser(@RequestBody @Valid Account account ) {
+    public ResponseEntity<List<Rating>> getRatingsForUser(@RequestBody @Valid Account account) {
         return ResponseEntity.ok(ratingService.getAllRatingsForUser(account));
     }
 
-    @RequestMapping(method = RequestMethod.GET,
+    @RequestMapping(
+            method = RequestMethod.GET,
             value = "/rating-usernames",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Rating> getRatingsForUserByUser(
@@ -73,7 +76,8 @@ public class RatingController {
         return ResponseEntity.ok(ratingService.getRatingForUserByUser(forUser, fromUser));
     }
 
-    @RequestMapping(method = RequestMethod.GET,
+    @RequestMapping(
+            method = RequestMethod.GET,
             value = "/rating",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -104,13 +108,14 @@ public class RatingController {
             value = "/add",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Rating> addRating(@RequestParam("from") String fromUser,
-                                            @RequestParam("for") String forUser,
-                                            @RequestParam("msg") String message,
-                                            @RequestParam("score") int score,
-                                            Authentication authentication) {
+    public ResponseEntity<Rating> addRating(
+            @RequestParam("from") String fromUser,
+            @RequestParam("for") String forUser,
+            @RequestParam("msg") String message,
+            @RequestParam("score") int score,
+            Authentication authentication) {
 
-        //TODO: Throw exception if authentication ins't provided  and remove fromUser
+        // TODO: Throw exception if authentication ins't provided  and remove fromUser
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ratingService.addRating(forUser, fromUser, message, score));
     }
@@ -127,19 +132,19 @@ public class RatingController {
             Account from = (Account) authentication.getPrincipal();
             rating.setFromUserID(from.getEmail());
         }
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ratingService.addRating(rating));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ratingService.addRating(rating));
     }
 
     @RequestMapping(
             method = RequestMethod.PUT,
             value = "/edit",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Rating> editRating(@RequestParam("forUser") String forUser,
-                                             @RequestParam("byUser") String byUser,
-                                             @RequestParam("msg") String message,
-                                             @RequestParam("score") int score,
-                                             Authentication authentication) {
+    public ResponseEntity<Rating> editRating(
+            @RequestParam("forUser") String forUser,
+            @RequestParam("byUser") String byUser,
+            @RequestParam("msg") String message,
+            @RequestParam("score") int score,
+            Authentication authentication) {
         if (((Account) authentication.getPrincipal()).getEmail().equals(byUser)) {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ratingService.editRating(forUser, byUser, message, score));
@@ -156,8 +161,7 @@ public class RatingController {
     public ResponseEntity<Rating> editRating(
             @RequestBody @Valid Rating rating, Authentication authentication) {
         if (((Account) authentication.getPrincipal()).getEmail().equals(rating.getFromUserID())) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ratingService.editRating(rating));
+            return ResponseEntity.status(HttpStatus.CREATED).body(ratingService.editRating(rating));
         } else {
             throw new RuntimeException("You do not have access to this user's reviews!");
         }
@@ -175,9 +179,10 @@ public class RatingController {
             method = RequestMethod.DELETE,
             value = "/delete",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Rating> deleteRating(@RequestParam("from") String fromUser,
-                                               @RequestParam("for") String forUser) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ratingService.deleteRating(forUser, fromUser));
+    public ResponseEntity<Rating> deleteRating(
+            @RequestParam("from") String fromUser, @RequestParam("for") String forUser) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ratingService.deleteRating(forUser, fromUser));
     }
 
     @RequestMapping(
@@ -185,13 +190,12 @@ public class RatingController {
             value = "/delete-json",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Rating> deleteRating(@RequestBody @Valid Rating rating, Authentication authentication) {
+    public ResponseEntity<Rating> deleteRating(
+            @RequestBody @Valid Rating rating, Authentication authentication) {
         Account loggedUser = (Account) authentication.getPrincipal();
-        if(!loggedUser.getEmail().equals(rating.getFromUserID())){
+        if (!loggedUser.getEmail().equals(rating.getFromUserID())) {
             throw new RuntimeException("Logged username and the owner of the event do not match");
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(ratingService.deleteRating(rating));
     }
-
-
 }

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RatingServiceImpl implements RatingService {
     private RatingRepository ratingRepository;
-//TODO: ADD EXCEPTIONS WHERE NEEDED
+
     @Autowired
     public RatingServiceImpl(RatingRepository ratingRepository) {
         this.ratingRepository = ratingRepository;
@@ -56,7 +56,7 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    public Rating addRating( Rating rating) {
+    public Rating addRating(Rating rating) {
         Rating review = new Rating();
         if (rating.getScore() < 0 || rating.getScore() > 5) {
             throw new RuntimeException("Invalid rating score exception");
@@ -71,13 +71,14 @@ public class RatingServiceImpl implements RatingService {
         if (existingRating.isPresent())
             throw new RuntimeException(
                     String.format(
-                            "Rating for user %s by user %s already exists", rating.getForUserID(), rating.getFromUserID()));
+                            "Rating for user %s by user %s already exists",
+                            rating.getForUserID(), rating.getFromUserID()));
         ratingRepository.save(review);
         return review;
     }
 
     @Override
-    public Rating addRating(String forUser, String byUser, String message, Integer score ) {
+    public Rating addRating(String forUser, String byUser, String message, Integer score) {
         Rating rating = new Rating();
         rating.setFromUserID(byUser);
         rating.setForUserID(forUser);
@@ -126,7 +127,11 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public Rating editRating(Rating rating) {
-        return editRating(rating.getForUserID(), rating.getFromUserID(), rating.getMessage(), rating.getScore());
+        return editRating(
+                rating.getForUserID(),
+                rating.getFromUserID(),
+                rating.getMessage(),
+                rating.getScore());
     }
 
     @Override

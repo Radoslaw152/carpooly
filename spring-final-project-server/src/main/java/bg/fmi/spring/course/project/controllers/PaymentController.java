@@ -5,6 +5,8 @@ import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
 import bg.fmi.spring.course.project.interfaces.services.PaymentService;
+import java.util.List;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/payment")
@@ -82,8 +81,7 @@ public class PaymentController {
             Account from = (Account) authentication.getPrincipal();
             payment.setOwner(from);
         }
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.newPayment(payment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.newPayment(payment));
     }
 
     @RequestMapping(
@@ -92,17 +90,17 @@ public class PaymentController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Payment> addPaymentWithVerification(
-            @RequestBody @Valid Payment payment,
-            Authentication authentication) {
+            @RequestBody @Valid Payment payment, Authentication authentication) {
 
         if (payment.getOwner().getEmail() == null) {
             Account from = (Account) authentication.getPrincipal();
             payment.setOwner(from);
         }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.newPaymentWIthVerification(
-                        payment.getOwner(), payment.getRide(),
-                        payment.getAmount(), payment.getPaymentType()));
+                .body(
+                        paymentService.newPaymentWIthVerification(
+                                payment.getOwner(), payment.getRide(),
+                                payment.getAmount(), payment.getPaymentType()));
     }
 
     @RequestMapping(
@@ -113,17 +111,17 @@ public class PaymentController {
             @RequestParam("user") String user,
             @RequestParam("driver") String driver,
             @RequestParam("amount") Double amount,
-            @RequestParam("type")PaymentType paymentType,
+            @RequestParam("type") PaymentType paymentType,
             Authentication authentication) {
 
         Account from = (Account) authentication.getPrincipal();
         if (!user.equals(from.getEmail())) {
             throw new RuntimeException(
-                    String.format("Provided user email (%s) does not match logged in user email (%s)",
+                    String.format(
+                            "Provided user email (%s) does not match logged in user email (%s)",
                             user, from.getEmail()));
         }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(paymentService.newPayment(user, driver, amount, paymentType));
     }
-
 }
