@@ -50,9 +50,9 @@ public class AccountServiceImpl implements AccountService {
                     Account.builder()
                             .email(emailAdmin)
                             .firstName(firstNameAdmin)
-                            .surname(surnameAdmin)
+                            .lastName(surnameAdmin)
                             .role(roleAdmin)
-                            .passwordHash(passwordAdmin)
+                            .secret(passwordAdmin)
                             .build();
             accountRepository.save(admin);
         }
@@ -93,8 +93,8 @@ public class AccountServiceImpl implements AccountService {
             throw new RuntimeException(
                     String.format("Account with email=%s exist!", account.getEmail()));
         }
-        String passwordHash = passwordEncoder.encode(account.getPasswordHash());
-        account.setPasswordHash(passwordHash);
+        String passwordHash = passwordEncoder.encode(account.getSecret());
+        account.setSecret(passwordHash);
         return accountRepository.save(account);
     }
 

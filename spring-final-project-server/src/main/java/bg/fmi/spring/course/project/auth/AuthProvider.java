@@ -36,7 +36,7 @@ public class AuthProvider implements AuthenticationProvider {
 
         Account account = optionalAccount.get();
         String credentials = String.valueOf(authentication.getCredentials());
-        if (!passwordEncoder.matches(credentials, account.getPasswordHash())) {
+        if (!passwordEncoder.matches(credentials, account.getSecret())) {
             return null;
         }
 

@@ -28,7 +28,7 @@ public class Account {
 
     @NotBlank
     @Length(min = 3, max = 16)
-    private String surname;
+    private String lastName;
 
     @NotBlank
     @Length(min = 3, max = 16)
@@ -36,7 +36,7 @@ public class Account {
 
     @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String passwordHash;
+    private String secret;
 
     private Role role;
     @Builder.Default private boolean isInRide = false;
