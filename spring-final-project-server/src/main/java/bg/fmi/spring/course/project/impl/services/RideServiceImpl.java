@@ -6,7 +6,6 @@ import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
 import bg.fmi.spring.course.project.interfaces.repositories.RideRepository;
 import bg.fmi.spring.course.project.interfaces.services.RideService;
-import com.google.gson.Gson;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

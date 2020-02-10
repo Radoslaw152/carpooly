@@ -1,12 +1,9 @@
 package bg.fmi.spring.course.project.dao;
 
+import com.google.gson.Gson;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.persistence.AttributeConverter;
-
-import com.google.gson.Gson;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
