@@ -1,6 +1,7 @@
 package bg.fmi.spring.course.project.interfaces.services;
 
 import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
 import java.util.List;
@@ -29,5 +30,6 @@ public interface RideService {
 
     Ride stopRide(Long id);
 
-    List<Ride> getAllRidesByDestination(String startingDestination, String finalDestination);
+    List<Ride> getAllRidesByDestination(
+            Coordinates startingDestination, Coordinates finalDestination);
 }

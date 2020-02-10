@@ -1,16 +1,20 @@
 package bg.fmi.spring.course.project.impl.services;
 
 import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
 import bg.fmi.spring.course.project.interfaces.repositories.RideRepository;
 import bg.fmi.spring.course.project.interfaces.services.RideService;
+import com.google.gson.Gson;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class RideServiceImpl implements RideService {
     private RideRepository rideRepository;
@@ -133,12 +137,17 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public List<Ride> getAllRidesByDestination(
-            String startingDestination, String finalDestination) {
+            Coordinates startingDestination, Coordinates finalDestination) {
         return rideRepository.findAll().stream()
                 .filter(
                         ride ->
-                                ride.getStartingDestination().equals(startingDestination)
-                                        && ride.getFinalDestination().equals(finalDestination)
+                                ride.getPathCoordinates()
+                                                .iterator()
+                                                .next()
+                                                .equals(startingDestination)
+                                        && ride.getPathCoordinates()
+                                                .get(ride.getPathCoordinates().size() - 1)
+                                                .equals(finalDestination)
                                         && !ride.getIsStarted())
                 .collect(Collectors.toList());
     }

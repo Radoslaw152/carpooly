@@ -1,6 +1,7 @@
 package bg.fmi.spring.course.project.controllers;
 
 import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
 import bg.fmi.spring.course.project.interfaces.services.RideService;
@@ -127,8 +128,19 @@ public class RideController {
             value = "filter",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Ride>> getAllRidesByStartingAndFinalDestination(
-            @RequestParam String startingDestination, @RequestParam String finalDestination) {
+            @RequestParam Double starLatitude,
+            @RequestParam Double startLongitude,
+            @RequestParam Double endLatitude,
+            @RequestParam Double endLongitude) {
         return ResponseEntity.ok(
-                rideService.getAllRidesByDestination(startingDestination, finalDestination));
+                rideService.getAllRidesByDestination(
+                        Coordinates.builder()
+                                .latitude(starLatitude)
+                                .longitude(startLongitude)
+                                .build(),
+                        Coordinates.builder()
+                                .latitude(endLatitude)
+                                .longitude(endLongitude)
+                                .build()));
     }
 }

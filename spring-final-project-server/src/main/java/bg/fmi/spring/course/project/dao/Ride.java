@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -11,8 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,8 +35,10 @@ public class Ride {
     @OneToMany @Builder.Default @JsonManagedReference
     private List<Payment> passengers = new ArrayList<>();
 
-    @NotBlank private String startingDestination;
-    @NotBlank private String finalDestination;
+    @Size(min = 2)
+    @Convert(converter = RideCoordinatesConverter.class)
+    private List<Coordinates> pathCoordinates;
+
     @NotNull private Double price;
 
     @NonNull
