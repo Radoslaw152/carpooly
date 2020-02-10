@@ -35,7 +35,8 @@ public class Payment {
     @JsonBackReference
     private Ride ride;
 
-    @NonNull private PaymentType paymentType;
+    @NonNull
+    private PaymentType paymentType;
 
     private Double amount;
 

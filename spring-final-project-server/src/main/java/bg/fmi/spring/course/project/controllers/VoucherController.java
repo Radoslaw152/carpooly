@@ -1,12 +1,11 @@
 package bg.fmi.spring.course.project.controllers;
 
 import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
 import bg.fmi.spring.course.project.dao.Voucher;
+import bg.fmi.spring.course.project.interfaces.services.PaymentService;
 import bg.fmi.spring.course.project.interfaces.services.VoucherService;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/voucher")
@@ -62,8 +65,8 @@ public class VoucherController {
             method = RequestMethod.GET,
             value = "/get",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Voucher> getRatingsFromUser(
-            @RequestParam("user") String username, @RequestParam("driver") String driver) {
+    public ResponseEntity<Voucher> getRatingsFromUser(@RequestParam("user") String username,
+                                                            @RequestParam("driver") String driver) {
 
         Optional<Voucher> voucher = voucherService.getVoucher(username, driver);
         return voucher.map(ResponseEntity::ok).orElse(null);
@@ -75,7 +78,8 @@ public class VoucherController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Voucher> getRatingsFromUser(
-            @RequestBody @Valid Account passenger, @RequestBody @Valid Account driver) {
+            @RequestBody @Valid Account passenger,
+            @RequestBody @Valid Account driver) {
 
         Optional<Voucher> voucher = voucherService.getVoucher(passenger, driver);
         return voucher.map(ResponseEntity::ok).orElse(null);
@@ -87,7 +91,8 @@ public class VoucherController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Voucher> deleteVoucher(
-            @RequestBody @Valid Account passenger, @RequestBody @Valid Account driver) {
+            @RequestBody @Valid Account passenger,
+            @RequestBody @Valid Account driver) {
 
         return deleteVoucher(passenger, driver);
     }
@@ -101,7 +106,7 @@ public class VoucherController {
             @RequestParam("driver") String driver,
             @RequestParam("amount") Integer amount) {
 
-        return ResponseEntity.ok(voucherService.giveVouchers(passenger, driver, amount));
+        return ResponseEntity.ok(voucherService.giveVouchers(passenger,driver,amount));
     }
 
     @RequestMapping(
@@ -112,8 +117,8 @@ public class VoucherController {
     public ResponseEntity<Voucher> giveVoucher(@RequestBody @Valid Voucher voucher) {
 
         return ResponseEntity.ok(
-                voucherService.giveVouchers(
-                        voucher.getOwner(), voucher.getDriver(), voucher.getAmount()));
+                voucherService.giveVouchers(voucher.getOwner(), voucher.getDriver(),voucher.getAmount())
+        );
     }
 
     @RequestMapping(
@@ -121,19 +126,23 @@ public class VoucherController {
             value = "/use-json",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Voucher> userVoucher(
-            @RequestBody @Valid Account passenger, @RequestBody @Valid Account driver) {
+    public ResponseEntity<Voucher> userVoucher(@RequestBody @Valid Account passenger,
+                                               @RequestBody @Valid Account driver) {
 
-        return ResponseEntity.ok(voucherService.consumeVoucher(passenger, driver));
+        return ResponseEntity.ok(
+                voucherService.consumeVoucher(passenger, driver)
+        );
     }
 
     @RequestMapping(
             method = RequestMethod.POST,
             value = "/use",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Voucher> userVoucher(
-            @RequestParam("user") String passenger, @RequestParam("driver") String driver) {
+    public ResponseEntity<Voucher> userVoucher(@RequestParam("user") String passenger,
+                                               @RequestParam("driver") String driver) {
 
-        return ResponseEntity.ok(voucherService.consumeVoucher(passenger, driver));
+        return ResponseEntity.ok(
+                voucherService.consumeVoucher(passenger, driver)
+        );
     }
 }
