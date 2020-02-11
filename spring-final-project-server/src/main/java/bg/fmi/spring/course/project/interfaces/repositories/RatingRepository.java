@@ -1,6 +1,6 @@
 package bg.fmi.spring.course.project.interfaces.repositories;
 
-import bg.fmi.spring.course.project.dao.Ratings;
+import bg.fmi.spring.course.project.dao.Rating;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RatingsRepository extends JpaRepository<Ratings, Long> {}
+public interface RatingRepository extends JpaRepository<Rating, Long> {}
