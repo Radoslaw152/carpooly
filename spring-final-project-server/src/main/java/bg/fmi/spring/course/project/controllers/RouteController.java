@@ -3,6 +3,7 @@ package bg.fmi.spring.course.project.controllers;
 import bg.fmi.spring.course.project.constants.RouteType;
 import bg.fmi.spring.course.project.constants.TimeInterval;
 import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Route;
 import bg.fmi.spring.course.project.interfaces.services.RouteService;
 import java.util.List;
@@ -40,7 +41,12 @@ public class RouteController {
             value = "/all-start-finish",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Route>> getRoutesByCoordinates(
-            @RequestParam("start") String start, @RequestParam("finish") String finish) {
+            @RequestParam("slat") double startLat,
+            @RequestParam("slong") double startLong,
+            @RequestParam("flat") double finishLat,
+            @RequestParam("flong") double finishLong) {
+        Coordinates start = new Coordinates(startLat, startLong);
+        Coordinates finish = new Coordinates(finishLat, finishLong);
         return ResponseEntity.ok(routeService.getAll(start, finish));
     }
 
@@ -67,7 +73,10 @@ public class RouteController {
             value = "/near-start",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Route>> getAllNearStart(
-            @RequestParam("start") String start, @RequestParam("r") double radius) {
+            @RequestParam("slat") double startLat,
+            @RequestParam("slong") double startLong,
+            @RequestParam("r") double radius) {
+        Coordinates start = new Coordinates(startLat, startLong);
         return ResponseEntity.ok(routeService.getAllCloseToStart(start, radius));
     }
 
@@ -76,7 +85,10 @@ public class RouteController {
             value = "/near-finish",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Route>> getAllNearFinish(
-            @RequestParam("finish") String finish, @RequestParam("r") double radius) {
+            @RequestParam("flat") double finishLat,
+            @RequestParam("flong") double finishLong,
+            @RequestParam("r") double radius) {
+        Coordinates finish = new Coordinates(finishLat, finishLong);
         return ResponseEntity.ok(routeService.getAllCloseToFinish(finish, radius));
     }
 
@@ -85,9 +97,13 @@ public class RouteController {
             value = "/near",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Route>> getAllNearFinish(
-            @RequestParam("start") String start,
-            @RequestParam("finish") String finish,
+            @RequestParam("slat") double startLat,
+            @RequestParam("slong") double startLong,
+            @RequestParam("flat") double finishLat,
+            @RequestParam("flong") double finishLong,
             @RequestParam("r") double radius) {
+        Coordinates start = new Coordinates(startLat, startLong);
+        Coordinates finish = new Coordinates(finishLat, finishLong);
         return ResponseEntity.ok(routeService.getAllCloseToStartAndFinish(start, finish, radius));
     }
 
@@ -96,11 +112,15 @@ public class RouteController {
             value = "/near-list",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Route>> getAllNearStartAndFinish(
-            @RequestParam("start") String start,
-            @RequestParam("finish") String finish,
+            @RequestParam("slat") double startLat,
+            @RequestParam("slong") double startLong,
+            @RequestParam("flat") double finishLat,
+            @RequestParam("flong") double finishLong,
             @RequestParam("r") double radius,
             @RequestParam("type") String type,
             @RequestParam("time") String time) {
+        Coordinates start = new Coordinates(startLat, startLong);
+        Coordinates finish = new Coordinates(finishLat, finishLong);
         return ResponseEntity.ok(
                 routeService.getAllClose(
                         start,
@@ -116,10 +136,14 @@ public class RouteController {
             value = "/route",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Route> getRoute(
-            @RequestParam("start") String start,
-            @RequestParam("finish") String finish,
+            @RequestParam("slat") double startLat,
+            @RequestParam("slong") double startLong,
+            @RequestParam("flat") double finishLat,
+            @RequestParam("flong") double finishLong,
             @RequestParam("type") String type,
             @RequestParam("time") String time) {
+        Coordinates start = new Coordinates(startLat, startLong);
+        Coordinates finish = new Coordinates(finishLat, finishLong);
         return ResponseEntity.ok(
                 routeService
                         .getRoute(
@@ -150,12 +174,16 @@ public class RouteController {
             value = "/add",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Route> addRoute(
-            @RequestParam("start") String start,
-            @RequestParam("finish") String finish,
+            @RequestParam("slat") double startLat,
+            @RequestParam("slong") double startLong,
+            @RequestParam("flat") double finishLat,
+            @RequestParam("flong") double finishLong,
             @RequestParam("type") String type,
             @RequestParam("time") String time,
             Authentication authentication) {
         Account user = (Account) authentication.getPrincipal();
+        Coordinates start = new Coordinates(startLat, startLong);
+        Coordinates finish = new Coordinates(finishLat, finishLong);
         return ResponseEntity.ok(
                 routeService.addRoute(
                         start,
@@ -170,12 +198,16 @@ public class RouteController {
             value = "/subscribe",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Route> subscribeForRoute(
-            @RequestParam("start") String start,
-            @RequestParam("finish") String finish,
+            @RequestParam("slat") double startLat,
+            @RequestParam("slong") double startLong,
+            @RequestParam("flat") double finishLat,
+            @RequestParam("flong") double finishLong,
             @RequestParam("type") String type,
             @RequestParam("time") String time,
             Authentication authentication) {
         Account user = (Account) authentication.getPrincipal();
+        Coordinates start = new Coordinates(startLat, startLong);
+        Coordinates finish = new Coordinates(finishLat, finishLong);
         return ResponseEntity.ok(
                 routeService.subscribeToRoute(
                         start,
@@ -209,10 +241,15 @@ public class RouteController {
             value = "/subscribers",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Account>> getSubscribers(
-            @RequestParam("start") String start,
-            @RequestParam("finish") String finish,
+            @RequestParam("slat") double startLat,
+            @RequestParam("slong") double startLong,
+            @RequestParam("flat") double finishLat,
+            @RequestParam("flong") double finishLong,
             @RequestParam("type") String type,
             @RequestParam("time") String time) {
+
+        Coordinates start = new Coordinates(startLat, startLong);
+        Coordinates finish = new Coordinates(finishLat, finishLong);
         return ResponseEntity.ok(
                 routeService.getSubcribers(
                         start, finish, RouteType.valueOf(type), TimeInterval.valueOf(time)));

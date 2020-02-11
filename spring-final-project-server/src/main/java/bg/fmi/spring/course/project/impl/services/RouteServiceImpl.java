@@ -3,6 +3,7 @@ package bg.fmi.spring.course.project.impl.services;
 import bg.fmi.spring.course.project.constants.RouteType;
 import bg.fmi.spring.course.project.constants.TimeInterval;
 import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Route;
 import bg.fmi.spring.course.project.interfaces.repositories.RouteRepository;
 import bg.fmi.spring.course.project.interfaces.services.AccountService;
@@ -28,12 +29,18 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public List<Route> getAll(String start, String finish) {
+    public List<Route> getAll(Coordinates start, Coordinates finish) {
         return getAll().stream()
                 .filter(
                         route ->
-                                route.getStartingDestination().equals(start)
-                                        && route.getFinalDestination().equals(finish))
+                                route.getPathCoordinates().get(0).getLatitude()
+                                                == start.getLatitude()
+                                        && route.getPathCoordinates().get(0).getLongitude()
+                                                == start.getLongitude()
+                                        && route.getPathCoordinates().get(1).getLongitude()
+                                                == finish.getLongitude()
+                                        && route.getPathCoordinates().get(1).getLatitude()
+                                                == finish.getLatitude())
                 .collect(Collectors.toList());
     }
 
@@ -68,56 +75,56 @@ public class RouteServiceImpl implements RouteService {
                 .collect(Collectors.toList());
     }
 
-    public double calculateDistance(String point1, String point2) {
-        String[] coordinates1 = point1.split(", ");
-        double x1 = Double.parseDouble(coordinates1[0]);
-        double y1 = Double.parseDouble(coordinates1[1]);
-        String[] coordinates2 = point2.split(", ");
-        double x2 = Double.parseDouble(coordinates2[0]);
-        double y2 = Double.parseDouble(coordinates2[1]);
-
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    public double calculateDistance(Coordinates point1, Coordinates point2) {
+        return Math.sqrt(
+                Math.pow((point1.getLatitude() - point2.getLatitude()), 2)
+                        + Math.pow((point1.getLongitude() - point2.getLongitude()), 2));
     }
 
     @Override
-    public List<Route> getAllCloseToStart(String start, Double radiusKm) {
+    public List<Route> getAllCloseToStart(Coordinates start, Double radiusKm) {
         return getAll().stream()
                 .filter(
                         route ->
-                                calculateDistance(start, route.getStartingDestination())
+                                calculateDistance(start, route.getPathCoordinates().get(0))
                                         <= radiusKm)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Route> getAllCloseToFinish(String finish, Double radiusKm) {
+    public List<Route> getAllCloseToFinish(Coordinates finish, Double radiusKm) {
         return getAll().stream()
-                .filter(route -> calculateDistance(finish, route.getFinalDestination()) <= radiusKm)
+                .filter(
+                        route ->
+                                calculateDistance(finish, route.getPathCoordinates().get(1))
+                                        <= radiusKm)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Route> getAllCloseToStartAndFinish(String start, String finish, Double radiusKm) {
+    public List<Route> getAllCloseToStartAndFinish(
+            Coordinates start, Coordinates finish, Double radiusKm) {
         return getAllClose(start, finish, radiusKm, radiusKm);
     }
 
     @Override
     public List<Route> getAllClose(
-            String start, String finish, Double radiusKmStart, Double radiusKmFinish) {
+            Coordinates start, Coordinates finish, Double radiusKmStart, Double radiusKmFinish) {
         return getAll().stream()
                 .filter(
                         route ->
-                                calculateDistance(finish, route.getFinalDestination())
+                                calculateDistance(finish, route.getPathCoordinates().get(1))
                                                 <= radiusKmStart
-                                        && calculateDistance(start, route.getStartingDestination())
+                                        && calculateDistance(
+                                                        start, route.getPathCoordinates().get(0))
                                                 <= radiusKmFinish)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Route> getAllClose(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             Double radiusKmStart,
             Double radiusKmFinish,
             RouteType routeType) {
@@ -129,8 +136,8 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public List<Route> getAllClose(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             Double radiusKmStart,
             Double radiusKmFinish,
             RouteType routeType,
@@ -142,28 +149,28 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public Optional<Route> getRoute(Route route) {
-        return getAll(route.getStartingDestination(), route.getFinalDestination()).stream()
+        return getAll(route.getPathCoordinates().get(0), route.getPathCoordinates().get(1)).stream()
                 .filter(route1 -> route1.getRouteType().equals(route.getRouteType()))
                 .findAny();
     }
 
     @Override
     public Optional<Route> getRoute(
-            String start, String finish, RouteType routeType, TimeInterval timeInterval) {
+            Coordinates start, Coordinates finish, RouteType routeType, TimeInterval timeInterval) {
         return getAll(start, finish).stream()
                 .filter(route -> route.getRouteType().equals(routeType))
                 .findFirst();
     }
 
     @Override
-    public Route addRoute(String start, String finish, String creator) {
+    public Route addRoute(Coordinates start, Coordinates finish, String creator) {
         return addRoute(start, finish, creator, RouteType.ANY, TimeInterval.ANY);
     }
 
     @Override
     public Route addRoute(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             String creator,
             RouteType routeType,
             TimeInterval timeInterval) {
@@ -176,14 +183,16 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public Route addRoute(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             Account creator,
             RouteType routeType,
             TimeInterval timeInterval) {
         Route route = new Route();
-        route.setFinalDestination(finish);
-        route.setStartingDestination(finish);
+        List<Coordinates> coordinates = new ArrayList<>();
+        coordinates.add(start);
+        coordinates.add(finish);
+        route.setPathCoordinates(coordinates);
         route.setRouteType(routeType);
         route.setTimeInterval(timeInterval);
         if (getRoute(route).isPresent()) {
@@ -209,17 +218,22 @@ public class RouteServiceImpl implements RouteService {
         if (!routeOptional.isPresent())
             throw new RuntimeException(
                     String.format(
-                            "Route with start = %s and finish = %s does not exist",
-                            route.getStartingDestination(), route.getFinalDestination()));
+                            "Route with start = (lat: %s; long: %s) and finish = (lat: %s; long: %s) does not exist",
+                            route.getPathCoordinates().get(0).getLatitude(),
+                            route.getPathCoordinates().get(0).getLongitude(),
+                            route.getPathCoordinates().get(1).getLatitude(),
+                            route.getPathCoordinates().get(1).getLongitude()));
         route = routeOptional.get();
         List<Account> accounts = route.getSubscribedUsers();
         if (accounts.contains(user)) {
             throw new RuntimeException(
                     String.format(
-                            "User %s is already subscribed for route from %s to %s for time interval %s",
+                            "User %s is already subscribed for route from (lat: %s; long: %s) to (lat: %s; long: %s) for time interval %s",
                             user.getEmail(),
-                            route.getStartingDestination(),
-                            route.getFinalDestination(),
+                            route.getPathCoordinates().get(0).getLatitude(),
+                            route.getPathCoordinates().get(0).getLongitude(),
+                            route.getPathCoordinates().get(1).getLatitude(),
+                            route.getPathCoordinates().get(1).getLongitude(),
                             route.getTimeInterval()));
         }
         accounts.add(user);
@@ -230,8 +244,8 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public Route subscribeToRoute(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             RouteType routeType,
             TimeInterval timeInterval,
             String user) {
@@ -245,7 +259,8 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public List<Account> getSubcribers(Route route) {
         List<Account> users = new ArrayList<>();
-        List<Route> routes = getAll(route.getStartingDestination(), route.getFinalDestination());
+        List<Route> routes =
+                getAll(route.getPathCoordinates().get(0), route.getPathCoordinates().get(1));
         for (Route r : routes) users.addAll(r.getSubscribedUsers());
         return users;
     }
@@ -264,7 +279,7 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public List<Account> getSubcribers(
-            String start, String finish, RouteType routeType, TimeInterval timeInterval) {
+            Coordinates start, Coordinates finish, RouteType routeType, TimeInterval timeInterval) {
         Optional<Route> route = getRoute(start, finish, routeType, timeInterval);
         if (route.isPresent()) return route.get().getSubscribedUsers();
         throw new RuntimeException("Route not found");

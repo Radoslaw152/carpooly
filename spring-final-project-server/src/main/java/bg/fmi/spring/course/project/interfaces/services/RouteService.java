@@ -3,6 +3,7 @@ package bg.fmi.spring.course.project.interfaces.services;
 import bg.fmi.spring.course.project.constants.RouteType;
 import bg.fmi.spring.course.project.constants.TimeInterval;
 import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Route;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,7 @@ import java.util.Optional;
 public interface RouteService {
     List<Route> getAll();
 
-    List<Route> getAll(String start, String finish);
+    List<Route> getAll(Coordinates start, Coordinates finish);
 
     List<Route> getAll(RouteType routeType);
 
@@ -18,25 +19,25 @@ public interface RouteService {
 
     List<Route> getAll(RouteType routeType, TimeInterval timeInterval);
 
-    List<Route> getAllCloseToStart(String start, Double radiusKm);
+    List<Route> getAllCloseToStart(Coordinates start, Double radiusKm);
 
-    List<Route> getAllCloseToFinish(String finish, Double radiusKm);
+    List<Route> getAllCloseToFinish(Coordinates finish, Double radiusKm);
 
-    List<Route> getAllCloseToStartAndFinish(String start, String finish, Double radiusKm);
-
-    List<Route> getAllClose(
-            String start, String finish, Double radiusKmStart, Double radiusKmFinish);
+    List<Route> getAllCloseToStartAndFinish(Coordinates start, Coordinates finish, Double radiusKm);
 
     List<Route> getAllClose(
-            String start,
-            String finish,
+            Coordinates start, Coordinates finish, Double radiusKmStart, Double radiusKmFinish);
+
+    List<Route> getAllClose(
+            Coordinates start,
+            Coordinates finish,
             Double radiusKmStart,
             Double radiusKmFinish,
             RouteType routeType);
 
     List<Route> getAllClose(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             Double radiusKmStart,
             Double radiusKmFinish,
             RouteType routeType,
@@ -45,22 +46,22 @@ public interface RouteService {
     Optional<Route> getRoute(Route route);
 
     Optional<Route> getRoute(
-            String start, String finish, RouteType routeType, TimeInterval timeInterval);
+            Coordinates start, Coordinates finish, RouteType routeType, TimeInterval timeInterval);
 
     Route addRoute(Route route);
 
-    Route addRoute(String start, String finish, String creator);
+    Route addRoute(Coordinates start, Coordinates finish, String creator);
 
     Route addRoute(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             String creator,
             RouteType routeType,
             TimeInterval timeInterval);
 
     Route addRoute(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             Account creator,
             RouteType routeType,
             TimeInterval timeInterval);
@@ -68,8 +69,8 @@ public interface RouteService {
     Route subscribeToRoute(Route route, Account user);
 
     Route subscribeToRoute(
-            String start,
-            String finish,
+            Coordinates start,
+            Coordinates finish,
             RouteType routeType,
             TimeInterval timeInterval,
             String user);
@@ -79,5 +80,5 @@ public interface RouteService {
     List<Account> getSubcribers(Route route, TimeInterval timeInterval);
 
     List<Account> getSubcribers(
-            String start, String finish, RouteType routeType, TimeInterval timeInterval);
+            Coordinates start, Coordinates finish, RouteType routeType, TimeInterval timeInterval);
 }

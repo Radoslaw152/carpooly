@@ -4,16 +4,17 @@ import bg.fmi.spring.course.project.constants.RouteType;
 import bg.fmi.spring.course.project.constants.TimeInterval;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.List;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Entity
 @Data
@@ -24,9 +25,9 @@ public class Route {
 
     @Id @GeneratedValue private Long id;
 
-    @NonNull private String startingDestination;
-
-    @NonNull private String finalDestination;
+    @Size(min = 2)
+    @Convert(converter = RideCoordinatesConverter.class)
+    private List<Coordinates> pathCoordinates;
 
     @NotNull private RouteType routeType;
 
