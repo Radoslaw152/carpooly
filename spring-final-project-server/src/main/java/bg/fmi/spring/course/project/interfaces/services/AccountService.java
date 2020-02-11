@@ -16,4 +16,6 @@ public interface AccountService {
     Account updateAccount(Long id, Account account);
 
     Account deleteAccount(Long id);
+
+    Account becomeDriver(Long id);
 }

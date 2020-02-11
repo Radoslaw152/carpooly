@@ -119,4 +119,11 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.delete(account);
         return account;
     }
+
+    @Override
+    public Account becomeDriver(Long id) {
+        Account account = getAccountById(id);
+        account.setRole(Role.DRIVER);
+        return accountRepository.save(account);
+    }
 }

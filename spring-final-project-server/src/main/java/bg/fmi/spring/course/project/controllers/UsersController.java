@@ -3,8 +3,11 @@ package bg.fmi.spring.course.project.controllers;
 import bg.fmi.spring.course.project.auth.types.IsAdmin;
 import bg.fmi.spring.course.project.auth.types.IsSelfOrAdmin;
 import bg.fmi.spring.course.project.auth.types.IsSelfOrAdminOrModeratorChangingNonAdmin;
+import bg.fmi.spring.course.project.constants.Role;
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.interfaces.services.AccountService;
+
+import java.security.Principal;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -78,6 +81,17 @@ public class UsersController {
     public ResponseEntity<Account> updateAccount(
             @PathVariable Long id, @Valid @RequestBody Account account) {
         Account updatedAccount = accountService.updateAccount(id, account);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedAccount);
+    }
+
+    @RequestMapping(
+            method = RequestMethod.POST,
+            value = "become-driver/{id}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Account> becomeDriver(Authentication principal) {
+        Account currentAccount = (Account) principal.getPrincipal();
+        Account updatedAccount = accountService.becomeDriver(currentAccount.getId());
+        currentAccount.setRole(Role.DRIVER);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedAccount);
     }
 
