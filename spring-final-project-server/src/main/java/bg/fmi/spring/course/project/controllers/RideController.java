@@ -116,7 +116,7 @@ public class RideController {
     }
 
     @RequestMapping(
-            method = RequestMethod.PUT,
+            method = RequestMethod.DELETE,
             value = "leaveRide/{id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -131,8 +131,9 @@ public class RideController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Ride>> getAllRidesByStartingAndFinalDestination(
-            @RequestBody RideFilterReq rideFilterReq) {
-        return ResponseEntity.ok(rideService.getJoinableFiltered(rideFilterReq));
+            @RequestBody RideFilterReq rideFilterReq, Authentication authentication) {
+        Account account = (Account) authentication.getPrincipal();
+        return ResponseEntity.ok(rideService.getJoinableFiltered(rideFilterReq, account.getId()));
     }
 
     @RequestMapping(
