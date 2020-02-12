@@ -1,31 +1,38 @@
 package bg.fmi.spring.course.project.impl.services;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import bg.fmi.spring.course.project.constants.PaymentType;
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
+import bg.fmi.spring.course.project.exceptions.NotFoundException;
 import bg.fmi.spring.course.project.interfaces.repositories.PaymentRepository;
 import bg.fmi.spring.course.project.interfaces.services.AccountService;
 import bg.fmi.spring.course.project.interfaces.services.PaymentService;
 import bg.fmi.spring.course.project.interfaces.services.RideService;
 import bg.fmi.spring.course.project.interfaces.services.VoucherService;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-    @Autowired private PaymentRepository paymentRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
-    @Autowired private AccountService accountService;
+    @Autowired
+    private AccountService accountService;
 
-    @Autowired private RideService rideService;
+    @Autowired
+    private RideService rideService;
 
-    @Autowired public VoucherService voucherService;
+    @Autowired
+    public VoucherService voucherService;
 
     @Override
     public List<Payment> getAllPayments() {
@@ -40,37 +47,50 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<Payment> getAllPaymentsForUser(String user) {
         return paymentRepository.findAll().stream()
-                .filter(p -> p.getOwner().getEmail().equals(user))
-                .collect(Collectors.toList());
+                                .filter(p -> getAccountOfPaymentOwner(p).getEmail().equals(user))
+                                .collect(Collectors.toList());
+    }
+
+    public Ride getRideByPayment(Payment payment) {
+        return rideService
+                .getRideById(payment.getRideId())
+                .orElseThrow(
+                        () ->
+                                NotFoundException.generateForTypeAndIdTypeAndId(
+                                        "ride", "id", payment.getRideId().toString()));
+    }
+
+    public Account getAccountOfPaymentOwner(Payment payment) {
+        return accountService.getAccountById(payment.getRideId());
     }
 
     @Override
     public List<Payment> getAllPaymentsForRide(Ride ride) {
         return paymentRepository.findAll().stream()
-                .filter(
-                        p ->
-                                p.getRide()
-                                                .getDriver()
-                                                .getEmail()
-                                                .equals(ride.getDriver().getEmail())
-                                        && p.getRide()
-                                                .getPathCoordinates()
-                                                .get(0)
-                                                .equals(ride.getPathCoordinates().get(0))
-                                        && p.getRide()
-                                                .getPathCoordinates()
-                                                .get(getAllPayments().size() - 1)
-                                                .equals(
-                                                        ride.getPathCoordinates()
-                                                                .get(getAllPayments().size() - 1)))
-                .collect(Collectors.toList());
+                                .filter(
+                                        p ->
+                                                getRideByPayment(p)
+                                                        .getDriver()
+                                                        .getEmail()
+                                                        .equals(ride.getDriver().getEmail())
+                                                        && getRideByPayment(p)
+                                                        .getPathCoordinates()
+                                                        .get(0)
+                                                        .equals(ride.getPathCoordinates().get(0))
+                                                        && getRideByPayment(p)
+                                                        .getPathCoordinates()
+                                                        .get(getAllPayments().size() - 1)
+                                                        .equals(
+                                                                ride.getPathCoordinates()
+                                                                    .get(getAllPayments().size() - 1)))
+                                .collect(Collectors.toList());
     }
 
     @Override
     public List<Payment> getAllPaymentsForRide(Long rideId) {
         return paymentRepository.findAll().stream()
-                .filter(payment -> payment.getRide().getId().equals(rideId))
-                .collect(Collectors.toList());
+                                .filter(payment -> getRideByPayment(payment).getId().equals(rideId))
+                                .collect(Collectors.toList());
     }
 
     @Override
@@ -91,8 +111,8 @@ public class PaymentServiceImpl implements PaymentService {
                                 "Payment amount (%s) is less than ride cost (%s)",
                                 amount, ride.getPrice()));
         }
-        payment.setRide(ride);
-        payment.setOwner(passenger);
+        payment.setRideId(ride.getId());
+        payment.setOwnerAccountId(passenger.getId());
         payment.setDateCompleted(new Date());
         payment.setPaymentType(paymentType);
         payment.setPaid(true);
@@ -105,27 +125,38 @@ public class PaymentServiceImpl implements PaymentService {
             Account passenger, Ride ride, double amount, PaymentType paymentType) {
         Optional<Account> passAcc = accountService.getAccountByEmail(passenger.getEmail());
         if (passAcc.isPresent()) {
-            Optional<Ride> rideOpt = rideService.getRideByDriver(ride.getDriver().getEmail());
-            if (rideOpt.isPresent()
-                    && rideOpt.get()
-                            .getPathCoordinates()
-                            .get(0)
-                            .equals(ride.getPathCoordinates().get(0))
-                    && rideOpt.get()
-                            .getPathCoordinates()
-                            .get(getAllPayments().size() - 1)
-                            .equals(ride.getPathCoordinates().get(getAllPayments().size() - 1))) {
-                List<Payment> passList = rideOpt.get().getPassengers();
+            Optional<Ride> requestedRide =
+                    rideService.getRidesByDriver(ride.getDriver().getEmail()).stream()
+                               .filter(
+                                       rideOpt ->
+                                               rideOpt.getPathCoordinates()
+                                                      .get(0)
+                                                      .equals(
+                                                              ride.getPathCoordinates()
+                                                                  .get(0))
+                                                       && rideOpt.getPathCoordinates()
+                                                                 .get(getAllPayments().size() - 1)
+                                                                 .equals(
+                                                                         ride.getPathCoordinates()
+                                                                             .get(
+                                                                                     getAllPayments()
+                                                                                             .size()
+                                                                                             - 1)))
+                               .findFirst();
+            if (requestedRide.isPresent()) {
+                List<Payment> passList = requestedRide.get().getPassengers();
                 for (Payment p : passList) {
-                    if (p.getOwner().getEmail().equals(passenger)
-                            && p.getRide().getId() == rideOpt.get().getId()) {
-                        return newPayment(passAcc.get(), rideOpt.get(), amount, paymentType);
+                    Account accountOfPaymentOwner = getAccountOfPaymentOwner(p);
+                    Ride rideByPayment = getRideByPayment(p);
+                    if (accountOfPaymentOwner.getEmail().equals(passenger.getEmail())
+                            && rideByPayment.getId().equals(requestedRide.get().getId())) {
+                        return newPayment(passAcc.get(), requestedRide.get(), amount, paymentType);
                     }
                 }
                 throw new RuntimeException(
                         String.format(
                                 "No passenger with email %s found in the ride %s",
-                                passenger.getEmail(), rideOpt.get().getId()));
+                                passenger.getEmail(), requestedRide.get().getId()));
             } else {
                 throw new RuntimeException(
                         String.format(
@@ -141,15 +172,15 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment newPayment(
-            String passenger, String driver, double amount, PaymentType paymentType) {
+            String passenger, Long rideId, double amount, PaymentType paymentType) {
         Optional<Account> passengerAcc = accountService.getAccountByEmail(passenger);
         if (!passengerAcc.isPresent()) {
             throw new RuntimeException("No such user: " + passenger);
         }
-        Optional<Ride> ride = rideService.getRideByDriver(driver);
-        if (!ride.isPresent()) throw new RuntimeException("No ride with driver " + driver);
+        Optional<Ride> rideById = rideService.getRideById(rideId);
+        if (!rideById.isPresent()) throw new RuntimeException("No ride with id " + rideId);
 
-        return newPayment(passengerAcc.get(), ride.get(), amount, paymentType);
+        return newPayment(passengerAcc.get(), rideById.get(), amount, paymentType);
     }
 
     @Override

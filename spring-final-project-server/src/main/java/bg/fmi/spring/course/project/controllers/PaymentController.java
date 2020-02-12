@@ -4,6 +4,7 @@ import bg.fmi.spring.course.project.constants.PaymentType;
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
+import bg.fmi.spring.course.project.impl.services.PaymentServiceImpl;
 import bg.fmi.spring.course.project.interfaces.services.PaymentService;
 import java.util.List;
 import javax.validation.Valid;
@@ -77,9 +78,9 @@ public class PaymentController {
     public ResponseEntity<Payment> addPayment(
             @RequestBody @Valid Payment payment, Authentication authentication) {
 
-        if (payment.getOwner().getEmail() == null) {
+        if (payment.getOwnerAccountId() == null) {
             Account from = (Account) authentication.getPrincipal();
-            payment.setOwner(from);
+            payment.setOwnerAccountId(from.getId());
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.newPayment(payment));
     }
@@ -92,15 +93,18 @@ public class PaymentController {
     public ResponseEntity<Payment> addPaymentWithVerification(
             @RequestBody @Valid Payment payment, Authentication authentication) {
 
-        if (payment.getOwner().getEmail() == null) {
-            Account from = (Account) authentication.getPrincipal();
-            payment.setOwner(from);
+        Account from = (Account) authentication.getPrincipal();
+        if (payment.getOwnerAccountId() == null) {
+            payment.setOwnerAccountId(from.getId());
         }
+        Ride rideByPayment = ((PaymentServiceImpl) paymentService).getRideByPayment(payment);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         paymentService.newPaymentWIthVerification(
-                                payment.getOwner(), payment.getRide(),
-                                payment.getAmount(), payment.getPaymentType()));
+                                from,
+                                rideByPayment,
+                                payment.getAmount(),
+                                payment.getPaymentType()));
     }
 
     @RequestMapping(
@@ -109,7 +113,7 @@ public class PaymentController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Payment> addPayment(
             @RequestParam("user") String user,
-            @RequestParam("driver") String driver,
+            @RequestParam("rideId") Long rideId,
             @RequestParam("amount") Double amount,
             @RequestParam("type") PaymentType paymentType,
             Authentication authentication) {
@@ -122,6 +126,6 @@ public class PaymentController {
                             user, from.getEmail()));
         }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentService.newPayment(user, driver, amount, paymentType));
+                .body(paymentService.newPayment(user, rideId, amount, paymentType));
     }
 }

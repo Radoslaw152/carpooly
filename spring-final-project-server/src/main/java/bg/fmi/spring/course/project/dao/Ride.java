@@ -1,6 +1,6 @@
 package bg.fmi.spring.course.project.dao;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -29,11 +29,14 @@ public class Ride {
     @Id @GeneratedValue private Long id;
 
     @OneToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "DRIVER_ID")
+    @JoinColumn
     private Account driver;
 
-    @OneToMany @Builder.Default @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Payment> passengers = new ArrayList<>();
+
+    @NotNull private LocalDate date;
 
     @Size(min = 2)
     @Convert(converter = RideCoordinatesConverter.class)

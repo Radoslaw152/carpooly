@@ -1,41 +1,31 @@
 package bg.fmi.spring.course.project.dao;
 
 import bg.fmi.spring.course.project.constants.PaymentType;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.Date;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "owner")
+@EqualsAndHashCode(of = {"ownerAccountId", "rideId"})
 public class Payment {
 
     @Id @GeneratedValue private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "OWNER_ID")
-    private Account owner;
+    @NotNull private Long ownerAccountId;
+    @NotNull private Long rideId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "RIDE_ID")
-    @JsonBackReference
-    private Ride ride;
-
-    @NonNull private PaymentType paymentType;
+    private PaymentType paymentType;
 
     private Double amount;
 

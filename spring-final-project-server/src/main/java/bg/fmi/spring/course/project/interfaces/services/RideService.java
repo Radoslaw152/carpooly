@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface RideService {
     List<Ride> getAllRides();
 
-    Optional<Ride> getRideByDriver(String email);
+    List<Ride> getRidesByDriver(String email);
 
     Optional<Ride> getRideById(Long id);
 

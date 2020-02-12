@@ -20,7 +20,7 @@ public interface PaymentService {
 
     Payment newPayment(Account passenger, Ride ride, double amount, PaymentType paymentType);
 
-    Payment newPayment(String passenger, String driver, double amount, PaymentType paymentType);
+    Payment newPayment(String passenger, Long rideId, double amount, PaymentType paymentType);
 
     Payment newPayment(Payment payment);
 

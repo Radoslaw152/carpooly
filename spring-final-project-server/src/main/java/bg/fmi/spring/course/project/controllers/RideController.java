@@ -4,6 +4,7 @@ import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
+import bg.fmi.spring.course.project.exceptions.NotFoundException;
 import bg.fmi.spring.course.project.interfaces.services.RideService;
 import java.util.List;
 import javax.validation.Valid;
@@ -38,17 +39,8 @@ public class RideController {
             method = RequestMethod.GET,
             value = "{id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Ride> getRideByDriver(@PathVariable String email) {
-        Ride ride =
-                rideService
-                        .getRideByDriver(email)
-                        .orElseThrow(
-                                () ->
-                                        new RuntimeException(
-                                                String.format(
-                                                        "There is no ride with driver email=%s",
-                                                        email)));
-        return ResponseEntity.ok(ride);
+    public ResponseEntity<List<Ride>> getRideByDriver(@PathVariable String email) {
+        return ResponseEntity.ok(rideService.getRidesByDriver(email));
     }
 
     @RequestMapping(
@@ -102,14 +94,24 @@ public class RideController {
     }
 
     @RequestMapping(
-            method = RequestMethod.PUT,
+            method = RequestMethod.POST,
             value = "joinRide/{id}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Ride> joinRide(
-            @PathVariable Long id, @RequestBody Payment payment, Authentication authentication) {
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Ride> joinRide(@PathVariable Long id, Authentication authentication) {
         Account account = (Account) authentication.getPrincipal();
-        payment.setOwner(account);
+        Ride rideById =
+                rideService
+                        .getRideById(id)
+                        .orElseThrow(
+                                () ->
+                                        NotFoundException.generateForTypeAndIdTypeAndId(
+                                                Ride.class.getSimpleName(), "id", id.toString()));
+        Payment payment =
+                Payment.builder()
+                        .rideId(rideById.getId())
+                        .ownerAccountId(account.getId())
+                        .isPaid(false)
+                        .build();
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(rideService.joinRide(id, payment));
     }
 

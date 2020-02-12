@@ -29,10 +29,10 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public Optional<Ride> getRideByDriver(String email) {
+    public List<Ride> getRidesByDriver(String email) {
         return rideRepository.findAll().stream()
                 .filter(ride -> ride.getDriver().getEmail().equals(email))
-                .findAny();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -51,13 +51,6 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public Ride addRide(Ride ride) {
-        Optional<Ride> existingRide = getRideByDriver(ride.getDriver().getEmail());
-        if (existingRide.isPresent()) {
-            throw new RuntimeException(
-                    String.format(
-                            "Ride with driver email=%s already exist",
-                            ride.getDriver().getEmail()));
-        }
         return rideRepository.save(ride);
     }
 
@@ -92,13 +85,17 @@ public class RideServiceImpl implements RideService {
         if (ride.getPassengers().contains(payment)) {
             throw new RuntimeException(
                     String.format(
-                            "Passenger with email=%s cannot join the same ride twice",
-                            payment.getOwner().getEmail()));
+                            "Passenger with id=%s cannot join the same ride twice",
+                            payment.getOwnerAccountId()));
         }
         if (ride.getPassengers().size() == ride.getMaxPassengers()) {
             throw new RuntimeException(
                     String.format(
                             "Ride has exceeded maximum passengers - %s", ride.getMaxPassengers()));
+        }
+        if (ride.getDriver().getId().equals(payment.getOwnerAccountId())) {
+            throw new RuntimeException(
+                    String.format("cannot join your own ride with id %s", ride.getId()));
         }
         ride.getPassengers().add(payment);
         return rideRepository.save(ride);
@@ -109,7 +106,7 @@ public class RideServiceImpl implements RideService {
         Ride ride = getRideByIdSecure(idRide);
         Optional<Payment> passenger =
                 ride.getPassengers().stream()
-                        .filter(payment -> payment.getOwner().equals(account))
+                        .filter(payment -> payment.getOwnerAccountId().equals(account.getId()))
                         .findAny();
         if (!passenger.isPresent()) {
             throw new RuntimeException(

@@ -6,8 +6,6 @@ import bg.fmi.spring.course.project.auth.types.IsSelfOrAdminOrModeratorChangingN
 import bg.fmi.spring.course.project.constants.Role;
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.interfaces.services.AccountService;
-
-import java.security.Principal;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
