@@ -1,5 +1,13 @@
 package bg.fmi.spring.course.project.impl.services;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Payment;
@@ -8,13 +16,7 @@ import bg.fmi.spring.course.project.dto.CoordinatesFilterReq;
 import bg.fmi.spring.course.project.dto.RideFilterReq;
 import bg.fmi.spring.course.project.interfaces.repositories.RideRepository;
 import bg.fmi.spring.course.project.interfaces.services.RideService;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -39,8 +41,8 @@ public class RideServiceImpl implements RideService {
     @Override
     public List<Ride> getRidesByDriver(String email) {
         return rideRepository.findAll().stream()
-                .filter(ride -> ride.getDriver().getEmail().equals(email))
-                .collect(Collectors.toList());
+                             .filter(ride -> ride.getDriver().getEmail().equals(email))
+                             .collect(Collectors.toList());
     }
 
     @Override
@@ -114,8 +116,8 @@ public class RideServiceImpl implements RideService {
         Ride ride = getRideByIdSecure(idRide);
         Optional<Payment> passenger =
                 ride.getPassengers().stream()
-                        .filter(payment -> payment.getOwnerAccountId().equals(account.getId()))
-                        .findAny();
+                    .filter(payment -> payment.getOwnerAccountId().equals(account.getId()))
+                    .findAny();
         if (!passenger.isPresent()) {
             throw new RuntimeException(
                     String.format(
@@ -143,22 +145,31 @@ public class RideServiceImpl implements RideService {
     public List<Ride> getAllRidesByDestination(
             Coordinates startingDestination, Coordinates finalDestination) {
         return rideRepository.findAll().stream()
-                .filter(
-                        ride ->
-                                ride.getPathCoordinates()
-                                                .iterator()
-                                                .next()
-                                                .equals(startingDestination)
-                                        && ride.getPathCoordinates()
-                                                .get(ride.getPathCoordinates().size() - 1)
-                                                .equals(finalDestination)
-                                        && !ride.getIsStarted())
-                .collect(Collectors.toList());
+                             .filter(
+                                     ride ->
+                                             ride.getPathCoordinates()
+                                                 .iterator()
+                                                 .next()
+                                                 .equals(startingDestination)
+                                                     && ride.getPathCoordinates()
+                                                            .get(ride.getPathCoordinates().size() - 1)
+                                                            .equals(finalDestination)
+                                                     && !ride.getIsStarted())
+                             .collect(Collectors.toList());
     }
 
     @Override
-    public List<Ride> getByFilter(final RideFilterReq rideFilterReq) {
-        List<Ride> allRides = getAllRides();
+    public List<Ride> getJoinableFiltered(final RideFilterReq rideFilterReq, Long requestingAccountId) {
+        List<Ride> allRides = getAllRides().stream()
+                                           .filter(ride ->
+                                                   ride.getPassengers()
+                                                       .stream()
+                                                       .noneMatch(passenger -> passenger.getOwnerAccountId()
+                                                                                        .equals(requestingAccountId)) &&
+                                                           !ride.getDriver()
+                                                                .getId()
+                                                                .equals(requestingAccountId))
+                                           .collect(Collectors.toList());
         if (rideFilterReq == null) {
             return allRides;
         }
@@ -169,12 +180,12 @@ public class RideServiceImpl implements RideService {
                             .filter(
                                     coord ->
                                             getPredicate(
-                                                            startingCoord.getRadiusInKm(),
-                                                            startingCoord.getCoordinates())
+                                                    startingCoord.getRadiusInKm(),
+                                                    startingCoord.getCoordinates())
                                                     .test(
                                                             coord.getPathCoordinates()
-                                                                    .iterator()
-                                                                    .next()))
+                                                                 .iterator()
+                                                                 .next()))
                             .collect(Collectors.toList());
         }
         CoordinatesFilterReq endCoord = rideFilterReq.getEndFilter();
@@ -184,11 +195,11 @@ public class RideServiceImpl implements RideService {
                             .filter(
                                     coord ->
                                             coord.getPathCoordinates().stream()
-                                                    .skip(1)
-                                                    .anyMatch(
-                                                            getPredicate(
-                                                                    endCoord.getRadiusInKm(),
-                                                                    endCoord.getCoordinates())))
+                                                 .skip(1)
+                                                 .anyMatch(
+                                                         getPredicate(
+                                                                 endCoord.getRadiusInKm(),
+                                                                 endCoord.getCoordinates())))
                             .collect(Collectors.toList());
         }
         return allRides;
@@ -207,8 +218,8 @@ public class RideServiceImpl implements RideService {
             double dist =
                     Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2))
                             + Math.cos(Math.toRadians(lat1))
-                                    * Math.cos(Math.toRadians(lat2))
-                                    * Math.cos(Math.toRadians(theta));
+                            * Math.cos(Math.toRadians(lat2))
+                            * Math.cos(Math.toRadians(theta));
             dist = Math.acos(dist);
             dist = Math.toDegrees(dist);
             dist = dist * 60 * 1.1515;

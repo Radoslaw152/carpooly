@@ -132,7 +132,7 @@ public class RideController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Ride>> getAllRidesByStartingAndFinalDestination(
             @RequestBody RideFilterReq rideFilterReq) {
-        return ResponseEntity.ok(rideService.getByFilter(rideFilterReq));
+        return ResponseEntity.ok(rideService.getJoinableFiltered(rideFilterReq));
     }
 
     @RequestMapping(

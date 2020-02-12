@@ -34,5 +34,5 @@ public interface RideService {
     List<Ride> getAllRidesByDestination(
             Coordinates startingDestination, Coordinates finalDestination);
 
-    List<Ride> getByFilter(RideFilterReq rideFilterReq);
+    List<Ride> getJoinableFiltered(RideFilterReq rideFilterReq, Long requestingAccountId);
 }
