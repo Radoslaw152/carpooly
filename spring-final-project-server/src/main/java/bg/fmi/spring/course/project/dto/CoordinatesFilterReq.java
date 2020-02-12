@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CoordinatesFilterReq {
     private Coordinates coordinates;
-    private int maxRadius;
+    private int radiusInKm;
 }

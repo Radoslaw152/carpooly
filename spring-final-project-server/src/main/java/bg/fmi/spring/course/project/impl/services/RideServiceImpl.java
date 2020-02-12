@@ -1,13 +1,5 @@
 package bg.fmi.spring.course.project.impl.services;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Payment;
@@ -16,7 +8,13 @@ import bg.fmi.spring.course.project.dto.CoordinatesFilterReq;
 import bg.fmi.spring.course.project.dto.RideFilterReq;
 import bg.fmi.spring.course.project.interfaces.repositories.RideRepository;
 import bg.fmi.spring.course.project.interfaces.services.RideService;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -24,7 +22,8 @@ public class RideServiceImpl implements RideService {
     private RideRepository rideRepository;
 
     private static Predicate<Coordinates> getPredicate(double maxDistanceInKm, Coordinates from) {
-        return coordinates -> maxDistanceInKm >= getDistanceBetweenTwoCoordinatesInKm(from, coordinates);
+        return coordinates ->
+                maxDistanceInKm >= getDistanceBetweenTwoCoordinatesInKm(from, coordinates);
     }
 
     @Autowired
@@ -40,8 +39,8 @@ public class RideServiceImpl implements RideService {
     @Override
     public List<Ride> getRidesByDriver(String email) {
         return rideRepository.findAll().stream()
-                             .filter(ride -> ride.getDriver().getEmail().equals(email))
-                             .collect(Collectors.toList());
+                .filter(ride -> ride.getDriver().getEmail().equals(email))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -115,8 +114,8 @@ public class RideServiceImpl implements RideService {
         Ride ride = getRideByIdSecure(idRide);
         Optional<Payment> passenger =
                 ride.getPassengers().stream()
-                    .filter(payment -> payment.getOwnerAccountId().equals(account.getId()))
-                    .findAny();
+                        .filter(payment -> payment.getOwnerAccountId().equals(account.getId()))
+                        .findAny();
         if (!passenger.isPresent()) {
             throw new RuntimeException(
                     String.format(
@@ -144,17 +143,17 @@ public class RideServiceImpl implements RideService {
     public List<Ride> getAllRidesByDestination(
             Coordinates startingDestination, Coordinates finalDestination) {
         return rideRepository.findAll().stream()
-                             .filter(
-                                     ride ->
-                                             ride.getPathCoordinates()
-                                                 .iterator()
-                                                 .next()
-                                                 .equals(startingDestination)
-                                                     && ride.getPathCoordinates()
-                                                            .get(ride.getPathCoordinates().size() - 1)
-                                                            .equals(finalDestination)
-                                                     && !ride.getIsStarted())
-                             .collect(Collectors.toList());
+                .filter(
+                        ride ->
+                                ride.getPathCoordinates()
+                                                .iterator()
+                                                .next()
+                                                .equals(startingDestination)
+                                        && ride.getPathCoordinates()
+                                                .get(ride.getPathCoordinates().size() - 1)
+                                                .equals(finalDestination)
+                                        && !ride.getIsStarted())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -165,27 +164,38 @@ public class RideServiceImpl implements RideService {
         }
         CoordinatesFilterReq startingCoord = rideFilterReq.getStartFilter();
         if (startingCoord != null) {
-            allRides = allRides.stream()
-                               .filter(coord -> getPredicate(startingCoord.getMaxRadius(),
-                                       startingCoord.getCoordinates()).test(coord.getPathCoordinates()
-                                                                                 .iterator()
-                                                                                 .next()))
-                               .collect(Collectors.toList());
+            allRides =
+                    allRides.stream()
+                            .filter(
+                                    coord ->
+                                            getPredicate(
+                                                            startingCoord.getRadiusInKm(),
+                                                            startingCoord.getCoordinates())
+                                                    .test(
+                                                            coord.getPathCoordinates()
+                                                                    .iterator()
+                                                                    .next()))
+                            .collect(Collectors.toList());
         }
         CoordinatesFilterReq endCoord = rideFilterReq.getEndFilter();
         if (endCoord != null) {
-            allRides = allRides.stream()
-                               .filter(coord -> coord.getPathCoordinates()
-                                                     .stream()
-                                                     .skip(1)
-                                                     .anyMatch(getPredicate(endCoord.getMaxRadius(),
-                                                             endCoord.getCoordinates())))
-                               .collect(Collectors.toList());
+            allRides =
+                    allRides.stream()
+                            .filter(
+                                    coord ->
+                                            coord.getPathCoordinates().stream()
+                                                    .skip(1)
+                                                    .anyMatch(
+                                                            getPredicate(
+                                                                    endCoord.getRadiusInKm(),
+                                                                    endCoord.getCoordinates())))
+                            .collect(Collectors.toList());
         }
         return allRides;
     }
 
-    private static double getDistanceBetweenTwoCoordinatesInKm(Coordinates cord1, Coordinates cord2) {
+    private static double getDistanceBetweenTwoCoordinatesInKm(
+            Coordinates cord1, Coordinates cord2) {
         double lat1 = cord1.getLatitude();
         double lon1 = cord1.getLongitude();
         double lat2 = cord2.getLatitude();
@@ -194,8 +204,11 @@ public class RideServiceImpl implements RideService {
             return 0;
         } else {
             double theta = lon1 - lon2;
-            double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math
-                    .cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+            double dist =
+                    Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2))
+                            + Math.cos(Math.toRadians(lat1))
+                                    * Math.cos(Math.toRadians(lat2))
+                                    * Math.cos(Math.toRadians(theta));
             dist = Math.acos(dist);
             dist = Math.toDegrees(dist);
             dist = dist * 60 * 1.1515;

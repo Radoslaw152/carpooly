@@ -5,7 +5,6 @@ import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
 import bg.fmi.spring.course.project.dto.RideFilterReq;
-
 import java.util.List;
 import java.util.Optional;
 
