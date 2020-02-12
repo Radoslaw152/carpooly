@@ -4,6 +4,8 @@ import bg.fmi.spring.course.project.dao.Account;
 import bg.fmi.spring.course.project.dao.Coordinates;
 import bg.fmi.spring.course.project.dao.Payment;
 import bg.fmi.spring.course.project.dao.Ride;
+import bg.fmi.spring.course.project.dto.RideFilterReq;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +34,6 @@ public interface RideService {
 
     List<Ride> getAllRidesByDestination(
             Coordinates startingDestination, Coordinates finalDestination);
+
+    List<Ride> getByFilter(RideFilterReq rideFilterReq);
 }

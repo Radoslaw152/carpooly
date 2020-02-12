@@ -1,13 +1,9 @@
 package bg.fmi.spring.course.project.controllers;
 
-import bg.fmi.spring.course.project.dao.Account;
-import bg.fmi.spring.course.project.dao.Coordinates;
-import bg.fmi.spring.course.project.dao.Payment;
-import bg.fmi.spring.course.project.dao.Ride;
-import bg.fmi.spring.course.project.exceptions.NotFoundException;
-import bg.fmi.spring.course.project.interfaces.services.RideService;
 import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,8 +13,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import bg.fmi.spring.course.project.dao.Account;
+import bg.fmi.spring.course.project.dao.Coordinates;
+import bg.fmi.spring.course.project.dao.Payment;
+import bg.fmi.spring.course.project.dao.Ride;
+import bg.fmi.spring.course.project.dto.RideFilterReq;
+import bg.fmi.spring.course.project.exceptions.NotFoundException;
+import bg.fmi.spring.course.project.interfaces.services.RideService;
 
 @RestController
 @RequestMapping("/api/rides")
@@ -50,7 +53,7 @@ public class RideController {
     public ResponseEntity<Ride> addRide(
             @RequestBody @Valid Ride ride, Authentication authentication) {
         if (ride.getDriver() == null) {
-            ride.setDriver((Account) authentication.getPrincipal());
+            ride.setDriver((Account)authentication.getPrincipal());
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(rideService.addRide(ride));
     }
@@ -98,7 +101,7 @@ public class RideController {
             value = "joinRide/{id}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Ride> joinRide(@PathVariable Long id, Authentication authentication) {
-        Account account = (Account) authentication.getPrincipal();
+        Account account = (Account)authentication.getPrincipal();
         Ride rideById =
                 rideService
                         .getRideById(id)
@@ -108,10 +111,10 @@ public class RideController {
                                                 Ride.class.getSimpleName(), "id", id.toString()));
         Payment payment =
                 Payment.builder()
-                        .rideId(rideById.getId())
-                        .ownerAccountId(account.getId())
-                        .isPaid(false)
-                        .build();
+                       .rideId(rideById.getId())
+                       .ownerAccountId(account.getId())
+                       .isPaid(false)
+                       .build();
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(rideService.joinRide(id, payment));
     }
 
@@ -121,28 +124,17 @@ public class RideController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Ride> leaveRide(@PathVariable Long id, Authentication authentication) {
-        Account account = (Account) authentication.getPrincipal();
+        Account account = (Account)authentication.getPrincipal();
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(rideService.leaveRide(id, account));
     }
 
     @RequestMapping(
-            method = RequestMethod.GET,
+            method = RequestMethod.POST,
             value = "filter",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<Ride>> getAllRidesByStartingAndFinalDestination(
-            @RequestParam Double starLatitude,
-            @RequestParam Double startLongitude,
-            @RequestParam Double endLatitude,
-            @RequestParam Double endLongitude) {
-        return ResponseEntity.ok(
-                rideService.getAllRidesByDestination(
-                        Coordinates.builder()
-                                .latitude(starLatitude)
-                                .longitude(startLongitude)
-                                .build(),
-                        Coordinates.builder()
-                                .latitude(endLatitude)
-                                .longitude(endLongitude)
-                                .build()));
+            @RequestBody RideFilterReq rideFilterReq) {
+        return ResponseEntity.ok(rideService.getByFilter(rideFilterReq));
     }
 }

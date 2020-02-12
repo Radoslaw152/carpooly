@@ -1,5 +1,10 @@
 package bg.fmi.spring.course.project.dao;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +37,17 @@ public class Ride {
     @JoinColumn
     private Account driver;
 
+    @NotNull private String name;
+
     @OneToMany(cascade = CascadeType.ALL)
     @Builder.Default
     private List<Payment> passengers = new ArrayList<>();
 
-    @NotNull private LocalDate date;
+    @JsonFormat(pattern = "MM/dd/yyyy")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @NotNull
+    private LocalDate startDate;
 
     @Size(min = 2)
     @Convert(converter = RideCoordinatesConverter.class)

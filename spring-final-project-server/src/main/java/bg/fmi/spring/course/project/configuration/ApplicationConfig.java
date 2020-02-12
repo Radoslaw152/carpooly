@@ -6,6 +6,9 @@ import bg.fmi.spring.course.project.auth.JwtAuthorizationFilter;
 import bg.fmi.spring.course.project.auth.LogoutHandler;
 import bg.fmi.spring.course.project.auth.SecurityConstants;
 import bg.fmi.spring.course.project.interfaces.services.AccountService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -79,6 +82,14 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter {
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authProvider);
         auth.authenticationEventPublisher(authEventPublisher);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        return mapper;
     }
 
     @Bean
